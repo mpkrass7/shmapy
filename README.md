@@ -1,5 +1,5 @@
 # Lone Wolf
-The fabulous (soon to be) package that builds out a United States hex map optional hex filling
+The fabulous (soon to be) package for building a United States hex map optional with optional hex filling
 
 ## Install
 `git clone ___`
@@ -10,5 +10,4 @@ The fabulous (soon to be) package that builds out a United States hex map option
 
 ![](hex_out.png)
 
-
-Special Credits to Kevin Arvai and Gregory Michaelson because they are heroes
+**Special Credits to Kevin Arvai and Gregory Michaelson because they are heroes**

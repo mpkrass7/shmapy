@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import warnings
 
 def _read_user_input(user_input):
@@ -29,6 +30,7 @@ def _read_user_input(user_input):
     # except:
     #     # is it a file
     values.columns = ['state', 'value']
+    
     values['value'] = values.value.astype(float)
     input_validator(values)
     # I think returning a dataframe is better!
@@ -44,8 +46,24 @@ def input_validator(values):
         # make sure abbreviations were converted
         assert all([len(state) == 2 for state in values["state"]])
     except AssertionError:
-        warnings.warn("""Expected input should only include 50 or 51 states. 
-        Map will have missing hexagons """)
+        warnings.warn(
+        """
+        Expected input should only include 50 or 51 states. 
+        Map will have missing hexagons
+         """
+         )
+
+    try:
+        assert max(values.value) > 1 or min(values.value) < 0
+    except AssertionError:
+        warnings.warn(
+            """
+            Expected values are between 0 and 1. 
+            Rescaling values so that max is 1 and min is 0
+            """)
+        
+        values['value']= np.interp(values.value, (values.value.min(), values.value.max()), (0.0, 1.0))
+
     return values
 
 def state_to_abbreviation(values):

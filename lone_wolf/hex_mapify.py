@@ -79,23 +79,34 @@ def _extract_coordinates(coords):
     vcoord = [c[1] for c in coord]
     return labels, hcoord, vcoord
 
-def _plot_hex(hcoord, vcoord, labels, pct, radius=1, size=10, color='#ffffff', figsize=(8,5), out_path=None):
+def _plot_hex(
+    #Data
+    hcoord, vcoord, labels, pct, 
+    # Hex sizing
+    radius=1, size=10, 
+    # Hex coloring
+    fill_color = '#d90429', top_color = '#000000', line_color = '#ffffff',
+    # Text Coloring
+    text_color='#ffffff', 
+    # Figure size and save path
+    figsize=(8,5), out_path=None):
+
     """
-    Builds map using extracted coordinates
+    Builds map using extracted coordinates, requires coordinates, labels, and a value from 0 to 1 to fill by
     """
 
     fig, ax = plt.subplots(figsize=figsize)
     ax.set_aspect('equal')
 
     for x, y, p, l in zip(hcoord, vcoord, pct, labels):
-        create_hex(ax, [x, y], radius=radius, pct=p)
-        ax.text(x, y, l, ha='center', va='center', size=size, color = color)
+        create_hex(ax, [x, y], radius=radius, pct=p, fill_color = fill_color, top_color = top_color, line_color = line_color)
+        ax.text(x, y, l, ha='center', va='center', size=size, color = text_color)
     if out_path:
         plt.savefig('./hex_out.png', dpi=300)
     plt.show()
 
 
-def plot_hex(input_df, out_path=None, radius=1, size=10, color='#ffffff', figsize=(8,5), ):
+def plot_hex(input_df, out_path=None, radius=1, size=10, fill_color = '#d90429', top_color = '#000000', line_color = '#ffffff', text_color='#ffffff',  figsize=(8,5), ):
     """
     expects user to have dataframe with first column as abbreviated states and second column as values. 
     All other columns are truncated
@@ -109,7 +120,8 @@ def plot_hex(input_df, out_path=None, radius=1, size=10, color='#ffffff', figsiz
     
     l,h,v = _extract_coordinates(dataset)
     
-    return _plot_hex(h, v, l, dataset.pct.astype(float), radius=radius, size=size, color=color, figsize=figsize, out_path=out_path)
+    return _plot_hex(h, v, l, dataset.pct.astype(float), 
+    radius=radius, size=size, fill_color=fill_color, top_color=top_color, line_color = line_color, text_color = text_color, figsize=figsize, out_path=out_path)
 
     
 
