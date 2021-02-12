@@ -70,7 +70,15 @@ def _create_hex(
             ybottom[0],
         ]
     else:
-        ymiddle = [ytop[0], ytop[1], ytop[2], ytop[2], ytop[2], ytop[1], ytop[0]]
+        ymiddle = [
+            ytop[0],
+            ytop[1],
+            ytop[2],
+            ytop[2],
+            ytop[2],
+            ytop[1],
+            ytop[0],
+        ]
 
     ax.fill_between(x, ybottom, ymiddle, facecolor=fill_color)
     ax.fill_between(x, ymiddle, ytop, facecolor=top_color)
@@ -111,11 +119,33 @@ def _plot_hex(
     figsize=(8, 5),
     out_path=None,
 ):
+    """[summary]
 
+    :param hcoord: [description]
+    :type hcoord: [type]
+    :param vcoord: [description]
+    :type vcoord: [type]
+    :param labels: [description]
+    :type labels: [type]
+    :param pct: [description]
+    :type pct: [type]
+    :param radius: [description], defaults to 1
+    :type radius: int, optional
+    :param size: [description], defaults to 10
+    :type size: int, optional
+    :param fill_color: [description], defaults to "#d90429"
+    :type fill_color: str, optional
+    :param top_color: [description], defaults to "#000000"
+    :type top_color: str, optional
+    :param line_color: [description], defaults to "#ffffff"
+    :type line_color: str, optional
+    :param text_color: [description], defaults to "#ffffff"
+    :type text_color: str, optional
+    :param figsize: [description], defaults to (8, 5)
+    :type figsize: tuple, optional
+    :param out_path: [description], defaults to None
+    :type out_path: [type], optional
     """
-    Builds map using extracted coordinates, requires coordinates, labels, and a value from 0 to 1 to fill by
-    """
-
     fig, ax = plt.subplots(figsize=figsize)
     ax.set_aspect("equal")
 
@@ -156,9 +186,9 @@ def plot_hex(
     input_df = _read_user_input(input_df)
     input_df.columns = ["state", "pct"]
 
-    dataset = coordinate_df.merge(input_df, left_on="Abbreviation", right_on="state")[
-        ["Abbreviation", "X", "Y", "pct"]
-    ]
+    dataset = coordinate_df.merge(
+        input_df, left_on="Abbreviation", right_on="state"
+    )[["Abbreviation", "X", "Y", "pct"]]
 
     l, h, v = _extract_coordinates(dataset)
 
