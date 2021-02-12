@@ -79,7 +79,7 @@ def _extract_coordinates(coords):
     vcoord = [c[1] for c in coord]
     return labels, hcoord, vcoord
 
-def _build_map(hcoord, vcoord, labels, pct, radius=1, size=20, color='#ffffff', save_figure=False):
+def _plot_hex(hcoord, vcoord, labels, pct, radius=1, size=20, color='#ffffff', save_figure=False):
     """
     Builds map using extracted coordinates
     """
@@ -95,7 +95,7 @@ def _build_map(hcoord, vcoord, labels, pct, radius=1, size=20, color='#ffffff', 
     plt.show()
 
 
-def build_map(input_df, radius=1, size=20, color='#ffffff', save_figure=False):
+def plot_hex(input_df, radius=1, size=20, color='#ffffff', save_figure=False):
     """
     expects user to have dataframe with first column as abbreviated states and second column as values. 
     All other columns are truncated
@@ -109,7 +109,7 @@ def build_map(input_df, radius=1, size=20, color='#ffffff', save_figure=False):
     
     l,h,v = _extract_coordinates(dataset)
     
-    return _build_map(h, v, l, dataset.pct.astype(float))
+    return _plot_hex(h, v, l, dataset.pct.astype(float))
 
     
 
@@ -117,6 +117,6 @@ value_df = input._read_user_input('lone_wolf/static/demo_input1.csv')
 
 # df1 = input._read_coordinate_file()
 # l, h, v = _extract_coordinates(df1)
-# _build_map(h, v, l, value_df.value)
+# _plot_yex(h, v, l, value_df.value)
 
-build_map(value_df)
+plot_hex(value_df)

@@ -1,5 +1,5 @@
-# lone_wolf
-Builds out united states hex map in Python with optional hex filling
+# Lone Wolf
+The fabulous (soon to be) package that builds out a United States hex map optional hex filling
 
 ## Install
 `git clone ___`
@@ -8,7 +8,7 @@ Builds out united states hex map in Python with optional hex filling
 ## Usage
 `lone-wolf plot-hex static/demo_input1.csv`
 
-<!-- ![](demo.png) -->
+![](hex_out.png)
 
 
 Special Credits to Kevin Arvai and Gregory Michaelson because they are heroes
