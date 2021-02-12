@@ -79,23 +79,23 @@ def _extract_coordinates(coords):
     vcoord = [c[1] for c in coord]
     return labels, hcoord, vcoord
 
-def _plot_hex(hcoord, vcoord, labels, pct, radius=1, size=20, color='#ffffff', save_figure=False):
+def _plot_hex(hcoord, vcoord, labels, pct, radius=1, size=10, color='#ffffff', figsize=(8,5), out_path=None):
     """
     Builds map using extracted coordinates
     """
 
-    fig, ax = plt.subplots(figsize=(10, 10))
+    fig, ax = plt.subplots(figsize=figsize)
     ax.set_aspect('equal')
 
     for x, y, p, l in zip(hcoord, vcoord, pct, labels):
         create_hex(ax, [x, y], radius=radius, pct=p)
         ax.text(x, y, l, ha='center', va='center', size=size, color = color)
-    if save_figure:
+    if out_path:
         plt.savefig('./hex_out.png', dpi=300)
     plt.show()
 
 
-def plot_hex(input_df, radius=1, size=20, color='#ffffff', save_figure=False):
+def plot_hex(input_df, out_path=None, radius=1, size=10, color='#ffffff', figsize=(8,5), ):
     """
     expects user to have dataframe with first column as abbreviated states and second column as values. 
     All other columns are truncated
@@ -109,7 +109,7 @@ def plot_hex(input_df, radius=1, size=20, color='#ffffff', save_figure=False):
     
     l,h,v = _extract_coordinates(dataset)
     
-    return _plot_hex(h, v, l, dataset.pct.astype(float))
+    return _plot_hex(h, v, l, dataset.pct.astype(float), radius=radius, size=size, color=color, figsize=figsize, out_path=out_path)
 
     
 
@@ -119,4 +119,4 @@ value_df = input._read_user_input('lone_wolf/static/demo_input1.csv')
 # l, h, v = _extract_coordinates(df1)
 # _plot_yex(h, v, l, value_df.value)
 
-plot_hex(value_df)
+plot_hex(value_df, out_path='hex_out.png')
