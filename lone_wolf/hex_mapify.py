@@ -176,11 +176,30 @@ def plot_hex(
     text_color="#ffffff",
     figsize=(8, 5),
 ):
-
-    """
-    expects user to have dataframe with first column as abbreviated states and second column as values.
+    """expects user to have dataframe with first column as abbreviated states and second column as values.
     All other columns are truncated
     Returns a hex map on the user input
+
+    :param input_df: [description]
+    :type input_df: [type]
+    :param out_path: [description], defaults to None
+    :type out_path: [type], optional
+    :param radius: [description], defaults to 1
+    :type radius: int, optional
+    :param size: [description], defaults to 10
+    :type size: int, optional
+    :param fill_color: [description], defaults to "#d90429"
+    :type fill_color: str, optional
+    :param top_color: [description], defaults to "#000000"
+    :type top_color: str, optional
+    :param line_color: [description], defaults to "#ffffff"
+    :type line_color: str, optional
+    :param text_color: [description], defaults to "#ffffff"
+    :type text_color: str, optional
+    :param figsize: [description], defaults to (8, 5)
+    :type figsize: tuple, optional
+    :return: [description]
+    :rtype: [type]
     """
     coordinate_df = _read_coordinate_file()
     input_df = _read_user_input(input_df)
