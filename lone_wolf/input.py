@@ -46,7 +46,9 @@ def _read_user_input(user_input):
 
 def _read_coordinate_file():
     # Reads built in state coordinates file
-    return pd.read_csv(project_directory.joinpath("static", "state_coordinates.csv"))
+    return pd.read_csv(
+        project_directory.joinpath("static", "state_coordinates.csv")
+    )
 
 
 def input_validator(values):
@@ -83,6 +85,8 @@ def state_to_abbreviation(values):
     """Always convert to state abbreviations"""
     coords = _read_coordinate_file()
     state_to_abbrev = dict(zip(coords["State"], coords["Abbreviation"]))
-    values["state"] = values["state"].apply(lambda row: state_to_abbrev[row] if row in state_to_abbrev else row)
+    values["state"] = values["state"].apply(
+        lambda row: state_to_abbrev[row] if row in state_to_abbrev else row
+    )
 
     return values

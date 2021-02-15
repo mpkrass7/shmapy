@@ -1,11 +1,8 @@
 import math
-import pandas as pd
 import matplotlib.pyplot as plt
 from lone_wolf.input import (
     _read_user_input,
     _read_coordinate_file,
-    input_validator,
-    state_to_abbreviation,
 )
 
 
@@ -89,8 +86,13 @@ def _create_hex(
 
 
 def _extract_coordinates(coords):
-    """
-    Extract Coordinates from base file
+    """Extract Coordinates from base file.
+
+
+    :param coords: [description]
+    :type coords: pandas DataFrame
+    :return: [description]
+    :rtype: tuple
     """
 
     coord = coords[["X", "Y"]].values
