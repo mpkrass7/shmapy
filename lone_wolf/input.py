@@ -2,6 +2,11 @@ import pandas as pd
 import numpy as np
 import warnings
 
+from pathlib import Path
+
+
+project_directory = Path(__file__).parent
+
 
 def _read_user_input(user_input):
     """
@@ -39,7 +44,7 @@ def _read_user_input(user_input):
 
 def _read_coordinate_file():
     # Reads built in state coordinates file
-    return pd.read_csv("lone_wolf/static/state_coordinates.csv")
+    return pd.read_csv(project_directory.joinpath("static", "state_coordinates.csv"))
 
 
 def input_validator(values):
