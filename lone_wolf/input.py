@@ -33,12 +33,13 @@ def _read_user_input(user_input):
         except:
             raise "Help! I can't find the data and don't want to be here"
 
-    values = values.iloc[:, :2]
     values.columns = ["state", "value"]
 
     values["value"] = values.value.astype(float)
+    # convert to state abbreviations
+    values = state_to_abbreviation(values)
+    # validate the input
     input_validator(values)
-    # I think returning a dataframe is better!
     return values
 
 
@@ -79,7 +80,8 @@ def input_validator(values):
 
 def state_to_abbreviation(values):
     """Always convert to state abbreviations"""
-    # TODO hard code the state abbreviation mapping
-    coords = pd.read_csv("lone_wolf/static/state_coordinates.csv")
-    state_to_abbrev = dict(zip(coords[["State", "Abbreviation"]]))
-    return state_to_abbrev
+    coords = _read_coordinate_file()
+    state_to_abbrev = dict(zip(coords["State"], coords["Abbreviation"]))
+    values["state"] = values["state"].apply(lambda row: state_to_abbrev[row] if row in state_to_abbrev else row)
+
+    return values
