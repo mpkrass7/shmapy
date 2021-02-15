@@ -205,9 +205,9 @@ def plot_hex(
     input_df = _read_user_input(input_df)
     input_df.columns = ["state", "pct"]
 
-    dataset = coordinate_df.merge(
-        input_df, left_on="Abbreviation", right_on="state"
-    )[["Abbreviation", "X", "Y", "pct"]]
+    dataset = coordinate_df.merge(input_df, left_on="Abbreviation", right_on="state")[
+        ["Abbreviation", "X", "Y", "pct"]
+    ]
 
     l, h, v = _extract_coordinates(dataset)
 
@@ -229,8 +229,14 @@ def plot_hex(
 
 # value_df = _read_user_input("lone_wolf/static/demo_input1.csv")
 
-# df1 = input._read_coordinate_file()
-# l, h, v = _extract_coordinates(df1)
-# _plot_yex(h, v, l, value_df.value)
+# # df1 = input._read_coordinate_file()s
+# # l, h, v = _extract_coordinates(df1)
+# # _plot_yex(h, v, l, value_df.value)
 
-# plot_hex(value_df, fill_color="#1d3557", top_color="#e63946")
+# plot_hex(
+#     value_df,
+#     radius=1,
+#     fill_color="#1d3557",
+#     top_color="#e63946",
+#     figsize=(20, 15),
+# )
