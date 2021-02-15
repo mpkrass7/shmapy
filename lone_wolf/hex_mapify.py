@@ -19,7 +19,21 @@ def _create_hex(
     line_color="#ffffff",
 ):
 
-    height = (math.sin(math.radians(60))) * radius
+    area_pct=pct
+    #user inputs the percent of area they want colored so we need to translate that into a percent height
+    if area_pct < 1/6:
+        height_for_area_calc=radius*np.sqrt(area_pct*(3/2))
+        pct=height_for_area_calc/(radius*2)
+        
+    elif (area_pct >= 1/6) and (area_pct<=5/6):
+        height_for_area_calc=2*radius*((3/4)*area_pct-(1/8))+radius/2
+        pct=height_for_area_calc/(radius*2)
+        
+    else:
+        height_for_area_calc=2*radius-(np.sqrt((1-area_pct)*(3/2))*radius)
+        pct=height_for_area_calc/(radius*2)
+
+    height= np.sqrt(3)/2 * radius
 
     if pct >= 0.25 and pct <= 0.75:
         xoffset = height
