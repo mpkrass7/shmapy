@@ -3,6 +3,7 @@ import numpy as np
 import warnings
 
 from pathlib import Path
+from pandas.errors import ParserError
 
 
 project_directory = Path(__file__).parent
@@ -22,13 +23,13 @@ def _read_user_input(user_input):
         try:
             values = pd.read_csv(user_input)
             assert len(values.columns) > 1
-        except (pd.parser.CParserError, AssertionError):
+        except (ParserError, AssertionError):
             values = pd.read_csv(user_input, sep="\t")
             assert len(values.columns) > 1
-        except (pd.parser.CParserError, AssertionError):
+        except (ParserError, AssertionError):
             values = pd.read_excel(user_input)
             assert len(values.columns) > 1
-        except (pd.parser.CParserError, AssertionError):
+        except (ParserError, AssertionError):
             values = pd.DataFrame(user_input)
         except:
             raise "Help! I can't find the data and don't want to be here"
