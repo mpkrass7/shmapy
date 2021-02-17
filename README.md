@@ -14,3 +14,10 @@ Install from source:
 ![](hex_out.png)
 
 **Special Credits to Kevin Arvai and Gregory Michaelson because they are heroes**
+
+## To Do Items:
+- Users can fill hexagons with constant color rather than percent fill
+- Users can supply custom cooridnates for the hexagons
+- Users can fill hexagons on a gradient
+- Users have **kwargs access to plot output to optionally include axes, title etc..
+- Improve filling mechanism to fill by area (Adrian halp please)

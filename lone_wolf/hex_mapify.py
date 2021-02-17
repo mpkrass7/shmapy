@@ -140,14 +140,14 @@ def _plot_hex(
     :param hcoord: [Horizontal Coordinate of the hexagon]
     :type hcoord: [numeric]
     :param vcoord: [Vertical Coordinate of the hexagon]
-    :type vcoord: [type]
+    :type vcoord: [numeric]
     :param labels: [Labels to go inside the hexagon]
-    :type labels: [type]
-    :param pct: [description]
-    :type pct: [type]
-    :param radius: [description], defaults to 1
+    :type labels: [str]
+    :param pct: [value (0-1) that a hexgon will be filled on]
+    :type pct: [float]
+    :param radius: [Radius of hexagon], defaults to 1
     :type radius: int, optional
-    :param size: [description], defaults to 10
+    :param size: [Size of labels], defaults to 10
     :type size: int, optional
     :param fill_color: [description], defaults to "#d90429"
     :type fill_color: str, optional
@@ -201,7 +201,7 @@ def plot_hex(
     All other columns are truncated
     Returns a hex map on the user input
 
-    :param input_df: [description]
+    :param input_df: [User provided dataframe, dictionary, or file location. Function will read first two columns as state and value]
     :type input_df: [type]
     :param out_path: [description], defaults to None
     :type out_path: [type], optional
