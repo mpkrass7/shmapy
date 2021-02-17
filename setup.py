@@ -13,6 +13,7 @@ setup(
     entry_points={
         "console_scripts": [
             f"{__project__} = {__project__}.__main__:main",
+            f"lone-wolf = {__project__}.__main__:main",
         ]
     },
 )

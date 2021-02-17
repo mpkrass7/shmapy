@@ -2,6 +2,12 @@ import pandas as pd
 import numpy as np
 import warnings
 
+from pathlib import Path
+from pandas.errors import ParserError
+
+
+project_directory = Path(__file__).parent
+
 
 def _read_user_input(user_input):
     """
@@ -17,29 +23,30 @@ def _read_user_input(user_input):
         try:
             values = pd.read_csv(user_input)
             assert len(values.columns) > 1
-        except (pd.parser.CParserError, AssertionError):
+        except (ParserError, AssertionError):
             values = pd.read_csv(user_input, sep="\t")
             assert len(values.columns) > 1
-        except (pd.parser.CParserError, AssertionError):
+        except (ParserError, AssertionError):
             values = pd.read_excel(user_input)
             assert len(values.columns) > 1
-        except (pd.parser.CParserError, AssertionError):
+        except (ParserError, AssertionError):
             values = pd.DataFrame(user_input)
-        except:
-            raise "Help! I can't find the data and don't want to be here"
+        # except:
+        #     raise "Help! I can't find the data and don't want to be here"
 
-    values = values.iloc[:, :2]
     values.columns = ["state", "value"]
 
     values["value"] = values.value.astype(float)
+    # convert to state abbreviations
+    values = state_to_abbreviation(values)
+    # validate the input
     input_validator(values)
-    # I think returning a dataframe is better!
     return values
 
 
 def _read_coordinate_file():
     # Reads built in state coordinates file
-    return pd.read_csv("lone_wolf/static/state_coordinates.csv")
+    return pd.read_csv(project_directory.joinpath("static", "state_coordinates.csv"))
 
 
 def input_validator(values):
@@ -74,7 +81,10 @@ def input_validator(values):
 
 def state_to_abbreviation(values):
     """Always convert to state abbreviations"""
-    # TODO hard code the state abbreviation mapping
-    coords = pd.read_csv("lone_wolf/static/state_coordinates.csv")
-    state_to_abbrev = dict(zip(coords[["State", "Abbreviation"]]))
-    return state_to_abbrev
+    coords = _read_coordinate_file()
+    state_to_abbrev = dict(zip(coords["State"], coords["Abbreviation"]))
+    values["state"] = values["state"].apply(
+        lambda row: state_to_abbrev[row] if row in state_to_abbrev else row
+    )
+
+    return values

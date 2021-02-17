@@ -20,21 +20,21 @@ def _create_hex(
     line_color="#ffffff",
 ):
 
-    area_pct=pct
-    #user inputs the percent of area they want colored so we need to translate that into a percent height
-    if area_pct < 1/6:
-        height_for_area_calc=radius*np.sqrt(area_pct*(3/2))
-        pct=height_for_area_calc/(radius*2)
-        
-    elif (area_pct >= 1/6) and (area_pct<=5/6):
-        height_for_area_calc=2*radius*((3/4)*area_pct-(1/8))+radius/2
-        pct=height_for_area_calc/(radius*2)
-        
-    else:
-        height_for_area_calc=2*radius-(np.sqrt((1-area_pct)*(3/2))*radius)
-        pct=height_for_area_calc/(radius*2)
+    area_pct = pct
+    # user inputs the percent of area they want colored so we need to translate that into a percent height
+    if area_pct < 1 / 6:
+        height_for_area_calc = radius * np.sqrt(area_pct * (3 / 2))
+        pct = height_for_area_calc / (radius * 2)
 
-    height= np.sqrt(3)/2 * radius
+    elif (area_pct >= 1 / 6) and (area_pct <= 5 / 6):
+        height_for_area_calc = 2 * radius * ((3 / 4) * area_pct - (1 / 8)) + radius / 2
+        pct = height_for_area_calc / (radius * 2)
+
+    else:
+        height_for_area_calc = 2 * radius - (np.sqrt((1 - area_pct) * (3 / 2)) * radius)
+        pct = height_for_area_calc / (radius * 2)
+
+    height = np.sqrt(3) / 2 * radius
 
     if pct >= 0.25 and pct <= 0.75:
         xoffset = height
@@ -133,14 +133,15 @@ def _plot_hex(
     # Figure size and save path
     figsize=(8, 5),
     out_path=None,
+    show_figure=True,
 ):
     """[summary]
 
-    :param hcoord: [description]
-    :type hcoord: [type]
-    :param vcoord: [description]
+    :param hcoord: [Horizontal Coordinate of the hexagon]
+    :type hcoord: [numeric]
+    :param vcoord: [Vertical Coordinate of the hexagon]
     :type vcoord: [type]
-    :param labels: [description]
+    :param labels: [Labels to go inside the hexagon]
     :type labels: [type]
     :param pct: [description]
     :type pct: [type]
@@ -175,9 +176,13 @@ def _plot_hex(
             line_color=line_color,
         )
         ax.text(x, y, l, ha="center", va="center", size=size, color=text_color)
+
+    plt.axis("off")
+
     if out_path:
-        plt.savefig("./hex_out.png", dpi=300)
-    plt.show()
+        plt.savefig("./hex_out.png", bbox_inches="tight", dpi=300)
+    if show_figure:
+        plt.show()
 
 
 def plot_hex(
@@ -190,6 +195,7 @@ def plot_hex(
     line_color="#ffffff",
     text_color="#ffffff",
     figsize=(8, 5),
+    show_figure=True,
 ):
     """expects user to have dataframe with first column as abbreviated states and second column as values.
     All other columns are truncated
@@ -239,11 +245,15 @@ def plot_hex(
         text_color=text_color,
         figsize=figsize,
         out_path=out_path,
+        show_figure=show_figure,
     )
 
 
-# value_df = _read_user_input("lone_wolf/static/demo_input1.csv")
-
+# value_df = _read_user_input("lone_wolf/static/hex_fill_out.csv")
+# print(value_df.head(20))
+# value_df["value"] = np.interp(
+#     value_df.value, (value_df.value.min(), value_df.value.max()), (0.1, 1)
+# )
 # # df1 = input._read_coordinate_file()s
 # # l, h, v = _extract_coordinates(df1)
 # # _plot_yex(h, v, l, value_df.value)
@@ -253,5 +263,8 @@ def plot_hex(
 #     radius=1,
 #     fill_color="#1d3557",
 #     top_color="#e63946",
-#     figsize=(20, 15),
+#     out_path="~/test_out.png",
+#     # show_figure=False,
+#     figsize=(8, 5),
 # )
+
