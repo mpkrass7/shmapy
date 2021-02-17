@@ -21,6 +21,30 @@ def _create_hex(
     top_color="#e63946",
     line_color="#ffffff",
 ):
+    """[summary]
+
+    Parameters
+    ----------
+    ax : [type]
+        [description]
+    coord : [type]
+        [description]
+    radius : [type]
+        [description]
+    pct : [type]
+        [description]
+    fill_color : str, optional
+        [description], by default "#1d3557"
+    top_color : str, optional
+        [description], by default "#e63946"
+    line_color : str, optional
+        [description], by default "#ffffff"
+
+    Returns
+    -------
+    [type]
+        [description]
+    """
 
     area_pct = pct
     # user inputs the percent of area they want colored so we need to translate that into a percent height
@@ -105,7 +129,7 @@ def _create_hex(
     return ax
 
 
-def _plot_hex(
+def plot_hex(
     # Data
     hcoord,
     vcoord,
@@ -129,7 +153,7 @@ def _plot_hex(
 ):
     """
     Plotting function that takes in a set of x coordinates, y coordinates, labels, and values
-     to generate a hex map with some level of fill.
+    to generate a hex map with some level of fill.
 
     :param hcoord: Horizontal Coordinate of the hexagon
     :type hcoord: numeric
@@ -186,7 +210,7 @@ def _plot_hex(
         plt.show()
 
 
-def plot_hex(
+def us_plot_hex(
     input_df,
     out_path=None,
     numeric_labels=None,
@@ -200,9 +224,10 @@ def plot_hex(
     show_figure=True,
     **kwargs,
 ):
-    """expects user to have dataframe with first column as abbreviated states and second column as values.
+    """
+    Expects user to have dataframe with first column as abbreviated states and second column as values.
     All other columns are truncated
-    Returns a hex map on the user input
+    Returns a hex map of the united states based on the user input
 
     :param input_df: [User provided dataframe, dictionary, or file location. Function will read first two columns as state and value]
     :type input_df: [type]
@@ -236,7 +261,7 @@ def plot_hex(
 
     l, h, v = _extract_coordinates(dataset)
 
-    return _plot_hex(
+    return plot_hex(
         h,
         v,
         l,
@@ -256,15 +281,15 @@ def plot_hex(
 
 
 # value_df = _read_user_input("lone_wolf/static/hex_fill_out.csv")
-# # print(value_df.head(50))
-# # # value_df["value"] = np.interp(
-# # #     value_df.value, (value_df.value.min(), value_df.value.max()), (0.1, 1)
-# # # )
-# # # # df1 = input._read_coordinate_file()s
-# # # # l, h, v = _extract_coordinates(df1)
-# # # # _plot_hex(h, v, l, value_df.value)
+# print(value_df.head(50))
+# value_df["value"] = np.interp(
+#     value_df.value, (value_df.value.min(), value_df.value.max()), (0.1, 1)
+# )
+# df1 = input._read_coordinate_file()s
+# l, h, v = _extract_coordinates(df1)
+# plot_hex(h, v, l, value_df.value)
 
-# plot_hex(
+# us_plot_hex(
 #     value_df,
 #     radius=1,
 #     numeric_labels="All",

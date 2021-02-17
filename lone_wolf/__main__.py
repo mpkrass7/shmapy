@@ -1,12 +1,10 @@
 import fire
-from lone_wolf.hex_mapify import plot_hex
+from lone_wolf.hex_mapify import us_plot_hex
 
 
 def main():
     fire.Fire(
-        {
-            "plot-hex": plot_hex,
-        }
+        {"plot-hex": us_plot_hex,}
     )
 
 
