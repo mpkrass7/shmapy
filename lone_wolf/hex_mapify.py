@@ -1,4 +1,5 @@
 import math
+from numpy.core import numeric
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -10,13 +11,25 @@ from lone_wolf.input import (
 )
 
 
+def _extract_coordinates(coords):
+    """
+    Extract Coordinates from base file
+    """
+
+    coord = coords[["X", "Y"]].values
+    labels = coords.Abbreviation
+    hcoord = [c[0] for c in coord]
+    vcoord = [c[1] for c in coord]
+    return labels, hcoord, vcoord
+
+
 def _create_hex(
     ax,
     coord,
     radius,
     pct,
-    fill_color="#d90429",
-    top_color="#000000",
+    fill_color="#1d3557",
+    top_color="#e63946",
     line_color="#ffffff",
 ):
 
@@ -103,24 +116,15 @@ def _create_hex(
     return ax
 
 
-def _extract_coordinates(coords):
-    """
-    Extract Coordinates from base file
-    """
-
-    coord = coords[["X", "Y"]].values
-    labels = coords.Abbreviation
-    hcoord = [c[0] for c in coord]
-    vcoord = [c[1] for c in coord]
-    return labels, hcoord, vcoord
-
-
 def _plot_hex(
     # Data
     hcoord,
     vcoord,
     labels,
     pct,
+    # TODO add this argument to the README
+    numeric_labels=None,
+    # fill_booleans=None,
     # Hex sizing
     radius=1,
     size=10,
@@ -131,9 +135,10 @@ def _plot_hex(
     # Text Coloring
     text_color="#ffffff",
     # Figure size and save path
-    figsize=(8, 5),
+    # figsize=(8, 5),
     out_path=None,
     show_figure=True,
+    **kwargs,
 ):
     """[summary]
 
@@ -149,9 +154,9 @@ def _plot_hex(
     :type radius: int, optional
     :param size: [Size of labels], defaults to 10
     :type size: int, optional
-    :param fill_color: [description], defaults to "#d90429"
+    :param fill_color: [description], defaults to "#1d3557"
     :type fill_color: str, optional
-    :param top_color: [description], defaults to "#000000"
+    :param top_color: [description], defaults to "#e63946"
     :type top_color: str, optional
     :param line_color: [description], defaults to "#ffffff"
     :type line_color: str, optional
@@ -162,8 +167,8 @@ def _plot_hex(
     :param out_path: [description], defaults to None
     :type out_path: [type], optional
     """
-    fig, ax = plt.subplots(figsize=figsize)
-    ax.set_aspect("equal")
+    fig, ax = plt.subplots(**kwargs)
+    # ax.set_aspect("equal")
 
     for x, y, p, l in zip(hcoord, vcoord, pct, labels):
         _create_hex(
@@ -175,12 +180,20 @@ def _plot_hex(
             top_color=top_color,
             line_color=line_color,
         )
-        ax.text(x, y, l, ha="center", va="center", size=size, color=text_color)
+        if numeric_labels and numeric_labels.lower() == "all":
+            l_new = l + f"\n {str(round(p*100))}%"
+        elif numeric_labels:
+            if l in numeric_labels:
+                l_new = l + f"\n {str(round(p*100))}%"
+            else:
+                l_new = l
+        else:
+            l_new = l
+        ax.text(x, y, l_new, ha="center", va="center", size=size, color=text_color)
 
     plt.axis("off")
-
     if out_path:
-        plt.savefig("./hex_out.png", bbox_inches="tight", dpi=300)
+        plt.savefig(out_path, bbox_inches="tight", dpi=300)
     if show_figure:
         plt.show()
 
@@ -188,14 +201,16 @@ def _plot_hex(
 def plot_hex(
     input_df,
     out_path=None,
+    numeric_labels=None,
     radius=1,
     size=10,
-    fill_color="#d90429",
-    top_color="#000000",
+    fill_color="#1d3557",
+    top_color="#e63946",
     line_color="#ffffff",
     text_color="#ffffff",
-    figsize=(8, 5),
+    # figsize=(8, 5),
     show_figure=True,
+    **kwargs,
 ):
     """expects user to have dataframe with first column as abbreviated states and second column as values.
     All other columns are truncated
@@ -222,6 +237,9 @@ def plot_hex(
     :return: [description]
     :rtype: [type]
     """
+    # print(numeric_labels)
+    print(kwargs["figsize"])
+    print(type(kwargs["figsize"]))
     coordinate_df = _read_coordinate_file()
     input_df = _read_user_input(input_df)
     input_df.columns = ["state", "pct"]
@@ -237,34 +255,36 @@ def plot_hex(
         v,
         l,
         dataset.pct.astype(float),
+        numeric_labels=numeric_labels,
         radius=radius,
         size=size,
         fill_color=fill_color,
         top_color=top_color,
         line_color=line_color,
         text_color=text_color,
-        figsize=figsize,
+        # figsize=figsize,
         out_path=out_path,
         show_figure=show_figure,
+        **kwargs,
     )
 
 
 # value_df = _read_user_input("lone_wolf/static/hex_fill_out.csv")
-# print(value_df.head(20))
-# value_df["value"] = np.interp(
-#     value_df.value, (value_df.value.min(), value_df.value.max()), (0.1, 1)
-# )
-# # df1 = input._read_coordinate_file()s
-# # l, h, v = _extract_coordinates(df1)
-# # _plot_yex(h, v, l, value_df.value)
+# # print(value_df.head(50))
+# # # value_df["value"] = np.interp(
+# # #     value_df.value, (value_df.value.min(), value_df.value.max()), (0.1, 1)
+# # # )
+# # # # df1 = input._read_coordinate_file()s
+# # # # l, h, v = _extract_coordinates(df1)
+# # # # _plot_hex(h, v, l, value_df.value)
 
 # plot_hex(
 #     value_df,
 #     radius=1,
-#     fill_color="#1d3557",
-#     top_color="#e63946",
+#     numeric_labels="All",
+#     # fill_color="#1d3557",
+#     # top_color="#e63946",
 #     out_path="~/test_out.png",
 #     # show_figure=False,
 #     figsize=(8, 5),
 # )
-
