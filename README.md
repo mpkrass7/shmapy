@@ -42,7 +42,7 @@ Resizse plot (**kwargs get passed to matplotlib.pyplot.subplots())
 
 ## To Do Items:
 - Users can fill hexagons with constant color rather than percent fill
-- Users can supply custom cooridnates for the hexagons
+- Users can supply custom cooridnates for the hexagons -- Done
 - Users can fill hexagons on a gradient
 - Users have **kwargs access to plot output to optionally include axes, title etc.. -- Some Kwargs are here!
 - Users can customize which states are filled
