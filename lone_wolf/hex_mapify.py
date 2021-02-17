@@ -6,21 +6,10 @@ import matplotlib.pyplot as plt
 from lone_wolf.input import (
     _read_user_input,
     _read_coordinate_file,
+    _extract_coordinates,
     input_validator,
     state_to_abbreviation,
 )
-
-
-def _extract_coordinates(coords):
-    """
-    Extract Coordinates from base file
-    """
-
-    coord = coords[["X", "Y"]].values
-    labels = coords.Abbreviation
-    hcoord = [c[0] for c in coord]
-    vcoord = [c[1] for c in coord]
-    return labels, hcoord, vcoord
 
 
 def _create_hex(
@@ -125,34 +114,34 @@ def _plot_hex(
     # TODO add this argument to the README
     numeric_labels=None,
     # fill_booleans=None,
-    # Hex sizing
+    # Hex/coloring
     radius=1,
-    size=10,
-    # Hex coloring
     fill_color="#d90429",
     top_color="#000000",
     line_color="#ffffff",
-    # Text Coloring
+    # Text Sizing/Coloring
+    size=10,
     text_color="#ffffff",
-    # Figure size and save path
-    # figsize=(8, 5),
+    # Options to save a figure or show figure
     out_path=None,
     show_figure=True,
     **kwargs,
 ):
-    """[summary]
+    """
+    Plotting function that takes in a set of x coordinates, y coordinates, labels, and values
+     to generate a hex map with some level of fill.
 
-    :param hcoord: [Horizontal Coordinate of the hexagon]
-    :type hcoord: [numeric]
-    :param vcoord: [Vertical Coordinate of the hexagon]
-    :type vcoord: [numeric]
+    :param hcoord: Horizontal Coordinate of the hexagon
+    :type hcoord: numeric
+    :param vcoord: Vertical Coordinate of the hexagon
+    :type vcoord: numeric
     :param labels: [Labels to go inside the hexagon]
-    :type labels: [str]
-    :param pct: [value (0-1) that a hexgon will be filled on]
-    :type pct: [float]
-    :param radius: [Radius of hexagon], defaults to 1
+    :type labels: str
+    :param pct: value (0-1) that a hexgon will be filled on
+    :type pct: float
+    :param radius: Radius of hexagon, defaults to 1
     :type radius: int, optional
-    :param size: [Size of labels], defaults to 10
+    :param size: Size of labels, defaults to 10
     :type size: int, optional
     :param fill_color: [description], defaults to "#1d3557"
     :type fill_color: str, optional
@@ -168,7 +157,6 @@ def _plot_hex(
     :type out_path: [type], optional
     """
     fig, ax = plt.subplots(**kwargs)
-    # ax.set_aspect("equal")
 
     for x, y, p, l in zip(hcoord, vcoord, pct, labels):
         _create_hex(
@@ -237,9 +225,7 @@ def plot_hex(
     :return: [description]
     :rtype: [type]
     """
-    # print(numeric_labels)
-    print(kwargs["figsize"])
-    print(type(kwargs["figsize"]))
+
     coordinate_df = _read_coordinate_file()
     input_df = _read_user_input(input_df)
     input_df.columns = ["state", "pct"]

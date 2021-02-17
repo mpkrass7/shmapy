@@ -49,6 +49,15 @@ def _read_coordinate_file():
     return pd.read_csv(project_directory.joinpath("static", "state_coordinates.csv"))
 
 
+def read_user_coordinates(df):
+    # Read in of X, Y, label coordinates for hexagons
+    df.columns = ["X", "Y", "Abbreviation"]
+
+    # l, h, v = _extract_coordinates(df)
+
+    return l, h, v
+
+
 def input_validator(values):
     try:
         assert len(values) == 50 or len(values) == 51
@@ -79,6 +88,18 @@ def input_validator(values):
     return values
 
 
+def _extract_coordinates(coords):
+    """
+    Extract Coordinates from base file
+    """
+
+    coord = coords[["X", "Y"]].values
+    labels = coords.Abbreviation
+    hcoord = [c[0] for c in coord]
+    vcoord = [c[1] for c in coord]
+    return labels, hcoord, vcoord
+
+
 def state_to_abbreviation(values):
     """Always convert to state abbreviations"""
     coords = _read_coordinate_file()
@@ -88,3 +109,4 @@ def state_to_abbreviation(values):
     )
 
     return values
+
