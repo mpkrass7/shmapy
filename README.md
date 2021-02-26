@@ -3,7 +3,7 @@ The fabulous (soon to be) package for building a United States hex map with opti
 
 ## Install
 
-Install from source: 
+Install from source:  
 `git clone git@github.com:mpkrass7/lone_wolf.git`  
 `python setup.py install` 
 
