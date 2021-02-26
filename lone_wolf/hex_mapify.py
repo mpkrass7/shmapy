@@ -123,8 +123,8 @@ def _create_hex(
 
     ax.fill_between(x, ybottom, ymiddle, facecolor=fill_color)
     ax.fill_between(x, ymiddle, ytop, facecolor=top_color)
-    ax.plot(x, ytop, color=line_color, linewidth=4)
-    ax.plot(x, ybottom, color=line_color, linewidth=4)
+    ax.plot(x, ytop, color=line_color, linewidth=1)
+    ax.plot(x, ybottom, color=line_color, linewidth=1)
 
     return ax
 
