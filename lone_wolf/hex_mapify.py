@@ -192,10 +192,11 @@ def plot_hex(
             top_color=top_color,
             line_color=line_color,
         )
-        if numeric_labels and numeric_labels.lower() == "all":
-            l_new = l + f"\n {str(round(p*100))}%"
-        elif numeric_labels:
-            if l in numeric_labels:
+        if type(numeric_labels) == str:
+            if numeric_labels.lower() == "all":
+                l_new = l + f"\n {str(round(p*100))}%"
+        elif len(numeric_labels) >= 1:
+            if l in list(numeric_labels):
                 l_new = l + f"\n {str(round(p*100))}%"
             else:
                 l_new = l
