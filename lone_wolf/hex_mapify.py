@@ -48,7 +48,7 @@ def _create_hex(
         [description]
     """
     assert chart_type in ['vbar', 'choropleth']
-    
+
     if chart_type=='vbar':
         area_pct = pct
         # user inputs the percent of area they want colored so we need to translate that into a percent height
@@ -242,14 +242,15 @@ def plot_hex(
             chart_type=chart_type,
             colormap=colormap
         )
-        if type(numeric_labels) == str:
-            if numeric_labels.lower() == "all":
-                l_new = l + f"\n {str(round(p*100))}%"
-        elif len(numeric_labels) >= 1:
-            if l in list(numeric_labels):
-                l_new = l + f"\n {str(round(p*100))}%"
-            else:
-                l_new = l
+        if numeric_labels:
+            if type(numeric_labels) == str:
+                if numeric_labels.lower() == "all":
+                    l_new = l + f"\n {str(round(p*100))}%"
+            elif len(numeric_labels) >= 1:
+                if l in list(numeric_labels):
+                    l_new = l + f"\n {str(round(p*100))}%"
+                else:
+                    l_new = l
         else:
             l_new = l
         ax.text(x, y, l_new, ha="center", va="center", size=size, color=text_color)
@@ -271,6 +272,8 @@ def us_plot_hex(
     top_color="#e63946",
     line_color="#ffffff",
     text_color="#ffffff",
+    #chart type
+    chart_type='vbar',
     # figsize=(8, 5),
     show_figure=True,
     **kwargs,
@@ -325,6 +328,7 @@ def us_plot_hex(
         line_color=line_color,
         text_color=text_color,
         # figsize=figsize,
+        chart_type=chart_type,
         out_path=out_path,
         show_figure=show_figure,
         **kwargs,
