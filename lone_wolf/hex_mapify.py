@@ -20,6 +20,8 @@ def _create_hex(
     fill_color="#1d3557",
     top_color="#e63946",
     line_color="#ffffff",
+    chart_type='vbar',
+    colormap='viridis'
 ):
     """[summary]
 
@@ -45,86 +47,130 @@ def _create_hex(
     [type]
         [description]
     """
+    if chart_type=='vbar':
+        area_pct = pct
+        # user inputs the percent of area they want colored so we need to translate that into a percent height
+        if area_pct < 1 / 6:
+            height_for_area_calc = radius * np.sqrt(area_pct * (3 / 2))
+            pct = height_for_area_calc / (radius * 2)
 
-    area_pct = pct
-    # user inputs the percent of area they want colored so we need to translate that into a percent height
-    if area_pct < 1 / 6:
-        height_for_area_calc = radius * np.sqrt(area_pct * (3 / 2))
-        pct = height_for_area_calc / (radius * 2)
+        elif (area_pct >= 1 / 6) and (area_pct <= 5 / 6):
+            height_for_area_calc = 2 * radius * ((3 / 4) * area_pct - (1 / 8)) + radius / 2
+            pct = height_for_area_calc / (radius * 2)
 
-    elif (area_pct >= 1 / 6) and (area_pct <= 5 / 6):
-        height_for_area_calc = 2 * radius * ((3 / 4) * area_pct - (1 / 8)) + radius / 2
-        pct = height_for_area_calc / (radius * 2)
+        else:
+            height_for_area_calc = 2 * radius - (np.sqrt((1 - area_pct) * (3 / 2)) * radius)
+            pct = height_for_area_calc / (radius * 2)
 
-    else:
-        height_for_area_calc = 2 * radius - (np.sqrt((1 - area_pct) * (3 / 2)) * radius)
-        pct = height_for_area_calc / (radius * 2)
+        height = np.sqrt(3) / 2 * radius
 
-    height = np.sqrt(3) / 2 * radius
+        if pct >= 0.25 and pct <= 0.75:
+            xoffset = height
+        elif pct < 0.25:
 
-    if pct >= 0.25 and pct <= 0.75:
-        xoffset = height
-    elif pct < 0.25:
+            xoffset = math.tan(math.radians(60)) * 2 * radius * pct
+        else:
+            xoffset = math.tan(math.radians(60)) * 2 * radius * (1 - pct)
 
-        xoffset = math.tan(math.radians(60)) * 2 * radius * pct
-    else:
-        xoffset = math.tan(math.radians(60)) * 2 * radius * (1 - pct)
-
-    x = [
-        coord[0] - height,
-        coord[0] - height,
-        coord[0] - xoffset,
-        coord[0],
-        coord[0] + xoffset,
-        coord[0] + height,
-        coord[0] + height,
-    ]
-
-    ytop = [
-        coord[1],
-        coord[1] + radius / 2,
-        coord[1] + (radius / (2 * height)) * (height - xoffset) + radius / 2,
-        coord[1] + radius,
-        coord[1] + (radius / (2 * height)) * (height - xoffset) + radius / 2,
-        coord[1] + radius / 2,
-        coord[1],
-    ]
-
-    ybottom = [
-        coord[1],
-        coord[1] - radius / 2,
-        coord[1] - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
-        coord[1] - radius,
-        coord[1] - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
-        coord[1] - radius / 2,
-        coord[1],
-    ]
-
-    if pct <= 0.5:
-        ymiddle = [
-            ybottom[0],
-            ybottom[1],
-            ybottom[2],
-            ybottom[2],
-            ybottom[2],
-            ybottom[1],
-            ybottom[0],
-        ]
-    else:
-        ymiddle = [
-            ytop[0],
-            ytop[1],
-            ytop[2],
-            ytop[2],
-            ytop[2],
-            ytop[1],
-            ytop[0],
+        x = [
+            coord[0] - height,
+            coord[0] - height,
+            coord[0] - xoffset,
+            coord[0],
+            coord[0] + xoffset,
+            coord[0] + height,
+            coord[0] + height,
         ]
 
-    ax.fill_between(x, ybottom, ymiddle, facecolor=fill_color)
-    ax.fill_between(x, ymiddle, ytop, facecolor=top_color)
-    ax.plot(x, ytop, color=line_color, linewidth=1)
-    ax.plot(x, ybottom, color=line_color, linewidth=1)
+        ytop = [
+            coord[1],
+            coord[1] + radius / 2,
+            coord[1] + (radius / (2 * height)) * (height - xoffset) + radius / 2,
+            coord[1] + radius,
+            coord[1] + (radius / (2 * height)) * (height - xoffset) + radius / 2,
+            coord[1] + radius / 2,
+            coord[1],
+        ]
+
+        ybottom = [
+            coord[1],
+            coord[1] - radius / 2,
+            coord[1] - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
+            coord[1] - radius,
+            coord[1] - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
+            coord[1] - radius / 2,
+            coord[1],
+        ]
+
+        if pct <= 0.5:
+            ymiddle = [
+                ybottom[0],
+                ybottom[1],
+                ybottom[2],
+                ybottom[2],
+                ybottom[2],
+                ybottom[1],
+                ybottom[0],
+            ]
+        else:
+            ymiddle = [
+                ytop[0],
+                ytop[1],
+                ytop[2],
+                ytop[2],
+                ytop[2],
+                ytop[1],
+                ytop[0],
+            ]
+
+        ax.fill_between(x, ybottom, ymiddle, facecolor=fill_color)
+        ax.fill_between(x, ymiddle, ytop, facecolor=top_color)
+        ax.plot(x, ytop, color=line_color, linewidth=1)
+        ax.plot(x, ybottom, color=line_color, linewidth=1)
+        
+    elif chart_type=='chloropleth':
+       
+        height = np.sqrt(3) / 2 * radius
+        xoffset=height
+
+        x = [
+            coord[0] - height,
+            coord[0] - height,
+            coord[0] - height,
+            coord[0],
+            coord[0] + height,
+            coord[0] + height,
+            coord[0] + height,
+        ]
+
+        ytop = [
+            coord[1],
+            coord[1] + radius / 2,
+            coord[1] + radius / 2,
+            coord[1] + radius,
+            coord[1] + radius / 2,
+            coord[1] + radius / 2,
+            coord[1],
+        ]
+
+        ybottom = [
+            coord[1],
+            coord[1] - radius / 2,
+            coord[1] - radius / 2,
+            coord[1] - radius,
+            coord[1] - radius / 2,
+            coord[1] - radius / 2,
+            coord[1],
+        ]
+
+        cmap=plt.get_cmap(colormap)
+        # see for reference https://matplotlib.org/stable/gallery/lines_bars_and_markers/fill_between_demo.html
+        ax.fill_between(x, ytop, ybottom, facecolor=cmap(pct))
+        ax.plot(x, ytop, color=line_color, linewidth=1)
+        ax.plot(x, ybottom, color=line_color, linewidth=1)
+        
+    else:
+        print('Chart type options: vbar, chloropleth')
 
     return ax
 
@@ -143,9 +189,12 @@ def plot_hex(
     fill_color="#d90429",
     top_color="#000000",
     line_color="#ffffff",
+    colormap='viridis',
     # Text Sizing/Coloring
     size=10,
     text_color="#ffffff",
+    #chart type
+    chart_type='vbar',
     # Options to save a figure or show figure
     out_path=None,
     show_figure=True,
@@ -191,6 +240,8 @@ def plot_hex(
             fill_color=fill_color,
             top_color=top_color,
             line_color=line_color,
+            chart_type=chart_type,
+            colormap=colormap
         )
         if numeric_labels and numeric_labels.lower() == "all":
             l_new = l + f"\n {str(round(p*100))}%"
@@ -280,7 +331,6 @@ def us_plot_hex(
     )
 
 
-# value_df = _read_user_input("lone_wolf/static/hex_fill_out.csv")
 # print(value_df.head(50))
 # value_df["value"] = np.interp(
 #     value_df.value, (value_df.value.min(), value_df.value.max()), (0.1, 1)
