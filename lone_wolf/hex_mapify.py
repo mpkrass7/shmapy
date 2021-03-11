@@ -47,6 +47,8 @@ def _create_hex(
     [type]
         [description]
     """
+    assert chart_type in ['vbar', 'choropleth']
+    
     if chart_type=='vbar':
         area_pct = pct
         # user inputs the percent of area they want colored so we need to translate that into a percent height
@@ -128,7 +130,7 @@ def _create_hex(
         ax.plot(x, ytop, color=line_color, linewidth=1)
         ax.plot(x, ybottom, color=line_color, linewidth=1)
         
-    elif chart_type=='chloropleth':
+    elif chart_type=='choropleth':
        
         height = np.sqrt(3) / 2 * radius
         xoffset=height
@@ -169,9 +171,6 @@ def _create_hex(
         ax.plot(x, ytop, color=line_color, linewidth=1)
         ax.plot(x, ybottom, color=line_color, linewidth=1)
         
-    else:
-        print('Chart type options: vbar, chloropleth')
-
     return ax
 
 
