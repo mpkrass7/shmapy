@@ -17,8 +17,8 @@ def _create_hex(
     coord,
     radius,
     pct,
-    fill_color="#1d3557",
-    top_color="#e63946",
+    #color=["#1d3557","#e63946"],
+    color=["#ef476f","#ffd166", "#06d6a0","#118ab2"],
     line_color="#ffffff",
     chart_type='vbar',
     colormap='viridis'
@@ -47,88 +47,245 @@ def _create_hex(
     [type]
         [description]
     """
+
+    #check if pct is a list of values or a single number
+    #if it's a length-one list convert it to the value
+    
+    if type(pct)==list:
+        if len(pct)==1:
+            pct[0]
+        
     assert chart_type in ['vbar', 'choropleth']
 
+
     if chart_type=='vbar':
-        area_pct = pct
-        # user inputs the percent of area they want colored so we need to translate that into a percent height
-        if area_pct < 1 / 6:
-            height_for_area_calc = radius * np.sqrt(area_pct * (3 / 2))
-            pct = height_for_area_calc / (radius * 2)
 
-        elif (area_pct >= 1 / 6) and (area_pct <= 5 / 6):
-            height_for_area_calc = 2 * radius * ((3 / 4) * area_pct - (1 / 8)) + radius / 2
-            pct = height_for_area_calc / (radius * 2)
+        if type(pct)==float:
+            """
+            if type pct==float, and chart_type=='vbar', the user presumably submitted 
+            single values between 0 and 1 intending to create a stacked bar chart "progress bar" 
+            with two values, aka original flavor lone-wolf.
+            """
+            area_pct = pct
+            # user inputs the percent of area they want colored so we need to translate that into a percent height
+            if area_pct < 1 / 6:
+                height_for_area_calc = radius * np.sqrt(area_pct * (3 / 2))
+                pct = height_for_area_calc / (radius * 2)
 
-        else:
-            height_for_area_calc = 2 * radius - (np.sqrt((1 - area_pct) * (3 / 2)) * radius)
-            pct = height_for_area_calc / (radius * 2)
+            elif (area_pct >= 1 / 6) and (area_pct <= 5 / 6):
+                height_for_area_calc = 2 * radius * ((3 / 4) * area_pct - (1 / 8)) + radius / 2
+                pct = height_for_area_calc / (radius * 2)
 
-        height = np.sqrt(3) / 2 * radius
+            else:
+                height_for_area_calc = 2 * radius - (np.sqrt((1 - area_pct) * (3 / 2)) * radius)
+                pct = height_for_area_calc / (radius * 2)
 
-        if pct >= 0.25 and pct <= 0.75:
-            xoffset = height
-        elif pct < 0.25:
+            height = np.sqrt(3) / 2 * radius
 
-            xoffset = math.tan(math.radians(60)) * 2 * radius * pct
-        else:
-            xoffset = math.tan(math.radians(60)) * 2 * radius * (1 - pct)
+            if pct >= 0.25 and pct <= 0.75:
+                xoffset = height
+            elif pct < 0.25:
 
-        x = [
-            coord[0] - height,
-            coord[0] - height,
-            coord[0] - xoffset,
-            coord[0],
-            coord[0] + xoffset,
-            coord[0] + height,
-            coord[0] + height,
-        ]
+                xoffset = math.tan(math.radians(60)) * 2 * radius * pct
+            else:
+                xoffset = math.tan(math.radians(60)) * 2 * radius * (1 - pct)
 
-        ytop = [
-            coord[1],
-            coord[1] + radius / 2,
-            coord[1] + (radius / (2 * height)) * (height - xoffset) + radius / 2,
-            coord[1] + radius,
-            coord[1] + (radius / (2 * height)) * (height - xoffset) + radius / 2,
-            coord[1] + radius / 2,
-            coord[1],
-        ]
+            x = [
+                coord[0] - height,
+                coord[0] - height,
+                coord[0] - xoffset,
+                coord[0],
+                coord[0] + xoffset,
+                coord[0] + height,
+                coord[0] + height,
+                ]
 
-        ybottom = [
-            coord[1],
-            coord[1] - radius / 2,
-            coord[1] - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
-            coord[1] - radius,
-            coord[1] - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
-            coord[1] - radius / 2,
-            coord[1],
-        ]
+            ytop = [
+                coord[1],
+                coord[1] + radius / 2,
+                coord[1] + (radius / (2 * height)) * (height - xoffset) + radius / 2,
+                coord[1] + radius,
+                coord[1] + (radius / (2 * height)) * (height - xoffset) + radius / 2,
+                coord[1] + radius / 2,
+                coord[1],
+                ]
+            
 
-        if pct <= 0.5:
-            ymiddle = [
-                ybottom[0],
-                ybottom[1],
-                ybottom[2],
-                ybottom[2],
-                ybottom[2],
-                ybottom[1],
-                ybottom[0],
-            ]
-        else:
-            ymiddle = [
-                ytop[0],
-                ytop[1],
-                ytop[2],
-                ytop[2],
-                ytop[2],
-                ytop[1],
-                ytop[0],
-            ]
+            ybottom = [
+                coord[1],
+                coord[1] - radius / 2,
+                coord[1] - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
+                coord[1] - radius,
+                coord[1] - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
+                coord[1] - radius / 2,
+                coord[1],
+                ]
 
-        ax.fill_between(x, ybottom, ymiddle, facecolor=fill_color)
-        ax.fill_between(x, ymiddle, ytop, facecolor=top_color)
-        ax.plot(x, ytop, color=line_color, linewidth=1)
-        ax.plot(x, ybottom, color=line_color, linewidth=1)
+            if pct < 0.25:
+                ymiddle = [
+                    ybottom[0],
+                    ybottom[1],
+                    ybottom[2],
+                    ybottom[2],
+                    ybottom[2],
+                    ybottom[1],
+                    ybottom[0],
+                ]
+            
+            elif pct>=0.25 and pct <=0.5:
+                ymiddle = [
+                coord[1] - (radius-(2*radius*pct)),
+                coord[1] - (radius-(2*radius*pct)),
+                coord[1] - (radius-(2*radius*pct)),
+                coord[1] - (radius-(2*radius*pct)),
+                coord[1] - (radius-(2*radius*pct)),
+                coord[1] - (radius-(2*radius*pct)),
+                coord[1] - (radius-(2*radius*pct))
+                ] 
+            elif pct>0.5 and pct <=0.75:
+                ymiddle = [
+                coord[1] + (2*radius*pct-radius),
+                coord[1] + (2*radius*pct-radius),
+                coord[1] + (2*radius*pct-radius),
+                coord[1] + (2*radius*pct-radius),
+                coord[1] + (2*radius*pct-radius),
+                coord[1] + (2*radius*pct-radius),
+                coord[1] + (2*radius*pct-radius),
+                ] 
+            else:
+                ymiddle = [
+                    ytop[0],
+                    ytop[1],
+                    ytop[2],
+                    ytop[2],
+                    ytop[2],
+                    ytop[1],
+                    ytop[0],
+                ]
+
+            ax.fill_between(x, ybottom, ymiddle, facecolor=color[0])
+            ax.fill_between(x, ymiddle, ytop, facecolor=color[1])
+            ax.plot(x, ytop, color=line_color, linewidth=1)
+            ax.plot(x, ybottom, color=line_color, linewidth=1)
+            
+        elif type(pct)==list:
+            """
+            if chart_type==vbar and type(pct)==list, we assume the list is a list of values
+            that should all add up to 100% for a stacked bar chart
+            """
+            #normalize the values so they sum to 100
+            normalized_pct=[p/sum(pct) for p in pct]
+            #define height of each bar (as overlapping bars of increasing height, each starting at 0).
+            cumul_pct=[]
+            for i in range(len(normalized_pct[0:-1])):
+                cumul_pct.append(sum(normalized_pct[0:i+1]))
+            cumul_pct.append(1.0) #avoiding rounding errors here
+            #We draw the bars over each other as if it was a 2-part vbar, tallest one first.
+            cumul_pct.reverse()
+            color.reverse()
+            print(cumul_pct)
+            for n,p in enumerate(cumul_pct):
+                  
+                area_pct = p
+                # user inputs the percent of area they want colored so we need to translate that into a percent height
+                if area_pct < 1 / 6:
+                    height_for_area_calc = radius * np.sqrt(area_pct * (3 / 2))
+                    p = height_for_area_calc / (radius * 2)
+
+                elif (area_pct >= 1 / 6) and (area_pct <= 5 / 6):
+                    height_for_area_calc = 2 * radius * ((3 / 4) * area_pct - (1 / 8)) + radius / 2
+                    p = height_for_area_calc / (radius * 2)
+
+                else:
+                    height_for_area_calc = 2 * radius - (np.sqrt((1 - area_pct) * (3 / 2)) * radius)
+                    p = height_for_area_calc / (radius * 2)
+
+                height = np.sqrt(3) / 2 * radius
+
+                if p >= 0.25 and p <= 0.75:
+                    xoffset = height
+                elif p < 0.25:
+
+                    xoffset = math.tan(math.radians(60)) * 2 * radius * p
+                else:
+                    xoffset = math.tan(math.radians(60)) * 2 * radius * (1 - p)
+
+                x = [
+                    coord[0] - height,
+                    coord[0] - height,
+                    coord[0] - xoffset,
+                    coord[0],
+                    coord[0] + xoffset,
+                    coord[0] + height,
+                    coord[0] + height,
+                    ]
+
+                ytop = [
+                    coord[1],
+                    coord[1] + radius / 2,
+                    coord[1] + (radius / (2 * height)) * (height - xoffset) + radius / 2,
+                    coord[1] + radius,
+                    coord[1] + (radius / (2 * height)) * (height - xoffset) + radius / 2,
+                    coord[1] + radius / 2,
+                    coord[1],
+                    ]
+
+                ybottom = [
+                    coord[1],
+                    coord[1] - radius / 2,
+                    coord[1] - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
+                    coord[1] - radius,
+                    coord[1] - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
+                    coord[1] - radius / 2,
+                    coord[1],
+                    ]
+
+                if p < 0.25:
+                    ymiddle = [
+                        ybottom[0],
+                        ybottom[1],
+                        ybottom[2],
+                        ybottom[2],
+                        ybottom[2],
+                        ybottom[1],
+                        ybottom[0],
+                           ]
+
+                elif p>=0.25 and p <=0.5:
+                    ymiddle = [
+                    coord[1] - (radius-(2*radius*p)),
+                    coord[1] - (radius-(2*radius*p)),
+                    coord[1] - (radius-(2*radius*p)),
+                    coord[1] - (radius-(2*radius*p)),
+                    coord[1] - (radius-(2*radius*p)),
+                    coord[1] - (radius-(2*radius*p)),
+                    coord[1] - (radius-(2*radius*p))
+                    ] 
+                elif p>0.5 and p <=0.75:
+                    ymiddle = [
+                    coord[1] + (2*radius*p-radius),
+                    coord[1] + (2*radius*p-radius),
+                    coord[1] + (2*radius*p-radius),
+                    coord[1] + (2*radius*p-radius),
+                    coord[1] + (2*radius*p-radius),
+                    coord[1] + (2*radius*p-radius),
+                    coord[1] + (2*radius*p-radius),
+                    ] 
+                else:
+                    ymiddle = [
+                        ytop[0],
+                        ytop[1],
+                        ytop[2],
+                        ytop[2],
+                        ytop[2],
+                        ytop[1],
+                        ytop[0],
+                        ]
+
+                ax.fill_between(x, ybottom, ymiddle, facecolor=color[n])
+                #ax.fill_between(x, ymiddle, ytop, facecolor=color[1])
+                ax.plot(x, ytop, color=line_color, linewidth=1)
+                ax.plot(x, ybottom, color=line_color, linewidth=1)
         
     elif chart_type=='choropleth':
        
@@ -170,6 +327,7 @@ def _create_hex(
         ax.fill_between(x, ytop, ybottom, facecolor=cmap(pct))
         ax.plot(x, ytop, color=line_color, linewidth=1)
         ax.plot(x, ybottom, color=line_color, linewidth=1)
+       
         
     return ax
 
@@ -185,8 +343,7 @@ def plot_hex(
     # fill_booleans=None,
     # Hex/coloring
     radius=1,
-    fill_color="#d90429",
-    top_color="#000000",
+    color=["#ef476f","#ffd166", "#06d6a0","#118ab2"],
     line_color="#ffffff",
     colormap='viridis',
     # Text Sizing/Coloring
@@ -236,8 +393,7 @@ def plot_hex(
             [x, y],
             radius=radius,
             pct=p,
-            fill_color=fill_color,
-            top_color=top_color,
+            color=["#ef476f","#ffd166", "#06d6a0","#118ab2"],
             line_color=line_color,
             chart_type=chart_type,
             colormap=colormap
@@ -268,8 +424,7 @@ def us_plot_hex(
     numeric_labels=None,
     radius=1,
     size=10,
-    fill_color="#1d3557",
-    top_color="#e63946",
+    color=["#ef476f","#ffd166", "#06d6a0","#118ab2"],
     line_color="#ffffff",
     text_color="#ffffff",
     #chart type
@@ -319,12 +474,11 @@ def us_plot_hex(
         h,
         v,
         l,
-        dataset.pct.astype(float),
+        dataset.pct,
         numeric_labels=numeric_labels,
         radius=radius,
         size=size,
-        fill_color=fill_color,
-        top_color=top_color,
+        color=color,
         line_color=line_color,
         text_color=text_color,
         # figsize=figsize,
@@ -333,23 +487,3 @@ def us_plot_hex(
         show_figure=show_figure,
         **kwargs,
     )
-
-
-# print(value_df.head(50))
-# value_df["value"] = np.interp(
-#     value_df.value, (value_df.value.min(), value_df.value.max()), (0.1, 1)
-# )
-# df1 = input._read_coordinate_file()s
-# l, h, v = _extract_coordinates(df1)
-# plot_hex(h, v, l, value_df.value)
-
-# us_plot_hex(
-#     value_df,
-#     radius=1,
-#     numeric_labels="All",
-#     # fill_color="#1d3557",
-#     # top_color="#e63946",
-#     out_path="~/test_out.png",
-#     # show_figure=False,
-#     figsize=(8, 5),
-# )

@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import warnings
+import ast
 
 from pathlib import Path
 from pandas.errors import ParserError
@@ -35,8 +36,11 @@ def _read_user_input(user_input):
         #     raise "Help! I can't find the data and don't want to be here"
 
     values.columns = ["state", "value"]
-
-    values["value"] = values.value.astype(float)
+    # users can input either a single float between 0-1 or a list of numerical values
+    # ast.literal_eval is picky about which datatypes it evals so we convert to string first 
+    #so that the value can become either number or list
+    values["value"] = values.value.astype(str)
+    values["value"] = values.value.apply(ast.literal_eval)
     # convert to state abbreviations
     values = state_to_abbreviation(values)
     # validate the input
@@ -70,20 +74,23 @@ def input_validator(values):
         Map will have missing hexagons
          """
         )
-
-    try:
-        assert max(values.value) <= 1 and min(values.value) >= 0
-    except AssertionError:
-        warnings.warn(
-            """
-            Expected values are between 0 and 1. 
-            Rescaling values so that max is 1 and min is 0
-            """
-        )
-        # Scale values to be between 0 1
-        values["value"] = np.interp(
-            values.value, (values.value.min(), values.value.max()), (0.0, 1.0)
-        )
+    #if the values aren't lists, we rescale each value to be between 0 and 1 with min and max set by the whole dataset.
+    #if there are list values, that means the user wants a stacked bar chart, and each list is set to sum to 1 in hexmapify.
+    #actually I do not think this should be part of the input validation.
+    if sum([type(i)==list for i in values.value])==0:
+        try:
+            assert max(values.value) <= 1 and min(values.value) >= 0
+        except AssertionError:
+            warnings.warn(
+                """
+                Expected values are between 0 and 1. 
+                Rescaling values so that max is 1 and min is 0
+                """
+            )
+            # Scale values to be between 0 1
+            values["value"] = np.interp(
+                values.value, (values.value.min(), values.value.max()), (0.0, 1.0)
+            )
 
     return values
 
