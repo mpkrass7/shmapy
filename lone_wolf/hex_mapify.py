@@ -47,6 +47,7 @@ def _create_hex(
     [type]
         [description]
     """
+
     #check if pct is a list of values or a single number
     #if it's a length-one list convert it to the value
     
@@ -54,6 +55,9 @@ def _create_hex(
         if len(pct)==1:
             pct[0]
         
+    assert chart_type in ['vbar', 'choropleth']
+
+
     if chart_type=='vbar':
 
         if type(pct)==float:
@@ -283,7 +287,7 @@ def _create_hex(
                 ax.plot(x, ytop, color=line_color, linewidth=1)
                 ax.plot(x, ybottom, color=line_color, linewidth=1)
         
-    elif chart_type=='chloropleth':
+    elif chart_type=='choropleth':
        
         height = np.sqrt(3) / 2 * radius
         xoffset=height
@@ -325,9 +329,6 @@ def _create_hex(
         ax.plot(x, ybottom, color=line_color, linewidth=1)
        
         
-    else:
-        print('Chart type options: vbar, chloropleth')
-
     return ax
 
 
@@ -397,13 +398,15 @@ def plot_hex(
             chart_type=chart_type,
             colormap=colormap
         )
-        if numeric_labels and numeric_labels.lower() == "all":
-            l_new = l + f"\n {str(round(p*100))}%"
-        elif numeric_labels:
-            if l in numeric_labels:
-                l_new = l + f"\n {str(round(p*100))}%"
-            else:
-                l_new = l
+        if numeric_labels:
+            if type(numeric_labels) == str:
+                if numeric_labels.lower() == "all":
+                    l_new = l + f"\n {str(round(p*100))}%"
+            elif len(numeric_labels) >= 1:
+                if l in list(numeric_labels):
+                    l_new = l + f"\n {str(round(p*100))}%"
+                else:
+                    l_new = l
         else:
             l_new = l
         ax.text(x, y, l_new, ha="center", va="center", size=size, color=text_color)
@@ -424,6 +427,8 @@ def us_plot_hex(
     color=["#ef476f","#ffd166", "#06d6a0","#118ab2"],
     line_color="#ffffff",
     text_color="#ffffff",
+    #chart type
+    chart_type='vbar',
     # figsize=(8, 5),
     show_figure=True,
     **kwargs,
@@ -477,6 +482,7 @@ def us_plot_hex(
         line_color=line_color,
         text_color=text_color,
         # figsize=figsize,
+        chart_type=chart_type,
         out_path=out_path,
         show_figure=show_figure,
         **kwargs,
