@@ -183,7 +183,6 @@ def _create_hex(
             #We draw the bars over each other as if it was a 2-part vbar, tallest one first.
             cumul_pct.reverse()
             color.reverse()
-            print(cumul_pct)
             for n,p in enumerate(cumul_pct):
                   
                 area_pct = p
