@@ -20,6 +20,7 @@ def _create_hex(
     #color=["#1d3557","#e63946"],
     color=["#ef476f","#ffd166", "#06d6a0","#118ab2"],
     line_color="#ffffff",
+    line_width=1,
     chart_type='vbar',
     colormap='viridis'
 ):
@@ -53,10 +54,9 @@ def _create_hex(
     
     if type(pct)==list:
         if len(pct)==1:
-            pct[0]
+            pct = pct[0]
         
     assert chart_type in ['vbar', 'choropleth']
-
 
     if chart_type=='vbar':
 
@@ -165,8 +165,8 @@ def _create_hex(
 
             ax.fill_between(x, ybottom, ymiddle, facecolor=color[0])
             ax.fill_between(x, ymiddle, ytop, facecolor=color[1])
-            ax.plot(x, ytop, color=line_color, linewidth=1)
-            ax.plot(x, ybottom, color=line_color, linewidth=1)
+            ax.plot(x, ytop, color=line_color, linewidth=line_width)
+            ax.plot(x, ybottom, color=line_color, linewidth=line_width)
             
         elif type(pct)==list:
             """
@@ -325,8 +325,8 @@ def _create_hex(
         cmap=plt.get_cmap(colormap)
         # see for reference https://matplotlib.org/stable/gallery/lines_bars_and_markers/fill_between_demo.html
         ax.fill_between(x, ytop, ybottom, facecolor=cmap(pct))
-        ax.plot(x, ytop, color=line_color, linewidth=1)
-        ax.plot(x, ybottom, color=line_color, linewidth=1)
+        ax.plot(x, ytop, color=line_color, linewidth=line_width)
+        ax.plot(x, ybottom, color=line_color, linewidth=line_width)
        
         
     return ax
@@ -340,11 +340,14 @@ def plot_hex(
     pct,
     # TODO add this argument to the README
     numeric_labels=None,
-    # fill_booleans=None,
+    numeric_labels_custom=None,
+    excluded_states=None,
+    excluded_color='grey',
     # Hex/coloring
     radius=1,
     color=["#ef476f","#ffd166", "#06d6a0","#118ab2"],
     line_color="#ffffff",
+    line_width=1,
     colormap='viridis',
     # Text Sizing/Coloring
     size=10,
@@ -387,14 +390,22 @@ def plot_hex(
     """
     fig, ax = plt.subplots(**kwargs)
 
-    for x, y, p, l in zip(hcoord, vcoord, pct, labels):
+    for x, y, p, l, nm in zip(hcoord, vcoord, pct, labels, numeric_labels_custom):
+
+        try:
+            assert type(excluded_states) == list and l in excluded_states
+            temp_color = np.repeat(excluded_color, len(color))
+        except:
+            temp_color = color
+
         _create_hex(
             ax,
             [x, y],
             radius=radius,
             pct=p,
-            color=["#ef476f","#ffd166", "#06d6a0","#118ab2"],
+            color=temp_color,
             line_color=line_color,
+            line_width=line_width,
             chart_type=chart_type,
             colormap=colormap
         )
@@ -403,7 +414,9 @@ def plot_hex(
                 if numeric_labels.lower() == "all":
                     l_new = l + f"\n {str(round(p*100))}%"
             elif len(numeric_labels) >= 1:
-                if l in list(numeric_labels):
+                if nm and l in numeric_labels:
+                    l_new = l + f"\n {nm}"
+                elif l in numeric_labels:
                     l_new = l + f"\n {str(round(p*100))}%"
                 else:
                     l_new = l
@@ -422,14 +435,18 @@ def us_plot_hex(
     input_df,
     out_path=None,
     numeric_labels=None,
+    numeric_labels_custom=None,
+    excluded_states=None,
+    excluded_color='grey',
     radius=1,
     size=10,
     color=["#ef476f","#ffd166", "#06d6a0","#118ab2"],
     line_color="#ffffff",
+    line_width=1,
     text_color="#ffffff",
     #chart type
     chart_type='vbar',
-    color_map='veridis',
+    colormap='veridis',
     # figsize=(8, 5),
     show_figure=True,
     **kwargs,
@@ -471,20 +488,27 @@ def us_plot_hex(
 
     l, h, v = _extract_coordinates(dataset)
 
+    if numeric_labels_custom:
+        custom_labels = dataset.Abbreviation.map(numeric_labels_custom)
+
     return plot_hex(
         h,
         v,
         l,
         dataset.pct,
         numeric_labels=numeric_labels,
+        numeric_labels_custom=custom_labels,
+        excluded_states=excluded_states,
+        excluded_color=excluded_color,
         radius=radius,
         size=size,
         color=color,
         line_color=line_color,
+        line_width=line_width,
         text_color=text_color,
         # figsize=figsize,
         chart_type=chart_type,
-        color_map=color_map,
+        colormap=colormap,
         out_path=out_path,
         show_figure=show_figure,
         **kwargs,
