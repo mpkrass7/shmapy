@@ -429,6 +429,7 @@ def us_plot_hex(
     text_color="#ffffff",
     #chart type
     chart_type='vbar',
+    color_map='veridis',
     # figsize=(8, 5),
     show_figure=True,
     **kwargs,
@@ -483,6 +484,7 @@ def us_plot_hex(
         text_color=text_color,
         # figsize=figsize,
         chart_type=chart_type,
+        color_map=color_map,
         out_path=out_path,
         show_figure=show_figure,
         **kwargs,
