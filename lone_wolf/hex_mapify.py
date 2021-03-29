@@ -17,12 +17,12 @@ def _create_hex(
     coord,
     radius,
     pct,
-    #color=["#1d3557","#e63946"],
-    color=["#ef476f","#ffd166", "#06d6a0","#118ab2"],
+    # color=["#1d3557","#e63946"],
+    color=["#ef476f", "#ffd166", "#06d6a0", "#118ab2"],
     line_color="#ffffff",
     line_width=1,
-    chart_type='vbar',
-    colormap='viridis'
+    chart_type="vbar",
+    colormap="viridis",
 ):
     """[summary]
 
@@ -49,18 +49,18 @@ def _create_hex(
         [description]
     """
 
-    #check if pct is a list of values or a single number
-    #if it's a length-one list convert it to the value
-    
-    if type(pct)==list:
-        if len(pct)==1:
+    # check if pct is a list of values or a single number
+    # if it's a length-one list convert it to the value
+
+    if type(pct) == list:
+        if len(pct) == 1:
             pct = pct[0]
-        
-    assert chart_type in ['vbar', 'choropleth']
 
-    if chart_type=='vbar':
+    assert chart_type in ["vbar", "choropleth"]
 
-        if type(pct)==float:
+    if chart_type == "vbar":
+
+        if type(pct) == float:
             """
             if type pct==float, and chart_type=='vbar', the user presumably submitted 
             single values between 0 and 1 intending to create a stacked bar chart "progress bar" 
@@ -73,11 +73,15 @@ def _create_hex(
                 pct = height_for_area_calc / (radius * 2)
 
             elif (area_pct >= 1 / 6) and (area_pct <= 5 / 6):
-                height_for_area_calc = 2 * radius * ((3 / 4) * area_pct - (1 / 8)) + radius / 2
+                height_for_area_calc = (
+                    2 * radius * ((3 / 4) * area_pct - (1 / 8)) + radius / 2
+                )
                 pct = height_for_area_calc / (radius * 2)
 
             else:
-                height_for_area_calc = 2 * radius - (np.sqrt((1 - area_pct) * (3 / 2)) * radius)
+                height_for_area_calc = 2 * radius - (
+                    np.sqrt((1 - area_pct) * (3 / 2)) * radius
+                )
                 pct = height_for_area_calc / (radius * 2)
 
             height = np.sqrt(3) / 2 * radius
@@ -98,7 +102,7 @@ def _create_hex(
                 coord[0] + xoffset,
                 coord[0] + height,
                 coord[0] + height,
-                ]
+            ]
 
             ytop = [
                 coord[1],
@@ -108,8 +112,7 @@ def _create_hex(
                 coord[1] + (radius / (2 * height)) * (height - xoffset) + radius / 2,
                 coord[1] + radius / 2,
                 coord[1],
-                ]
-            
+            ]
 
             ybottom = [
                 coord[1],
@@ -119,7 +122,7 @@ def _create_hex(
                 coord[1] - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
                 coord[1] - radius / 2,
                 coord[1],
-                ]
+            ]
 
             if pct < 0.25:
                 ymiddle = [
@@ -131,27 +134,27 @@ def _create_hex(
                     ybottom[1],
                     ybottom[0],
                 ]
-            
-            elif pct>=0.25 and pct <=0.5:
+
+            elif pct >= 0.25 and pct <= 0.5:
                 ymiddle = [
-                coord[1] - (radius-(2*radius*pct)),
-                coord[1] - (radius-(2*radius*pct)),
-                coord[1] - (radius-(2*radius*pct)),
-                coord[1] - (radius-(2*radius*pct)),
-                coord[1] - (radius-(2*radius*pct)),
-                coord[1] - (radius-(2*radius*pct)),
-                coord[1] - (radius-(2*radius*pct))
-                ] 
-            elif pct>0.5 and pct <=0.75:
+                    coord[1] - (radius - (2 * radius * pct)),
+                    coord[1] - (radius - (2 * radius * pct)),
+                    coord[1] - (radius - (2 * radius * pct)),
+                    coord[1] - (radius - (2 * radius * pct)),
+                    coord[1] - (radius - (2 * radius * pct)),
+                    coord[1] - (radius - (2 * radius * pct)),
+                    coord[1] - (radius - (2 * radius * pct)),
+                ]
+            elif pct > 0.5 and pct <= 0.75:
                 ymiddle = [
-                coord[1] + (2*radius*pct-radius),
-                coord[1] + (2*radius*pct-radius),
-                coord[1] + (2*radius*pct-radius),
-                coord[1] + (2*radius*pct-radius),
-                coord[1] + (2*radius*pct-radius),
-                coord[1] + (2*radius*pct-radius),
-                coord[1] + (2*radius*pct-radius),
-                ] 
+                    coord[1] + (2 * radius * pct - radius),
+                    coord[1] + (2 * radius * pct - radius),
+                    coord[1] + (2 * radius * pct - radius),
+                    coord[1] + (2 * radius * pct - radius),
+                    coord[1] + (2 * radius * pct - radius),
+                    coord[1] + (2 * radius * pct - radius),
+                    coord[1] + (2 * radius * pct - radius),
+                ]
             else:
                 ymiddle = [
                     ytop[0],
@@ -167,24 +170,24 @@ def _create_hex(
             ax.fill_between(x, ymiddle, ytop, facecolor=color[1])
             ax.plot(x, ytop, color=line_color, linewidth=line_width)
             ax.plot(x, ybottom, color=line_color, linewidth=line_width)
-            
-        elif type(pct)==list:
+
+        elif type(pct) == list:
             """
             if chart_type==vbar and type(pct)==list, we assume the list is a list of values
             that should all add up to 100% for a stacked bar chart
             """
-            #normalize the values so they sum to 100
-            normalized_pct=[p/sum(pct) for p in pct]
-            #define height of each bar (as overlapping bars of increasing height, each starting at 0).
-            cumul_pct=[]
+            # normalize the values so they sum to 100
+            normalized_pct = [p / sum(pct) for p in pct]
+            # define height of each bar (as overlapping bars of increasing height, each starting at 0).
+            cumul_pct = []
             for i in range(len(normalized_pct[0:-1])):
-                cumul_pct.append(sum(normalized_pct[0:i+1]))
-            cumul_pct.append(1.0) #avoiding rounding errors here
-            #We draw the bars over each other as if it was a 2-part vbar, tallest one first.
+                cumul_pct.append(sum(normalized_pct[0 : i + 1]))
+            cumul_pct.append(1.0)  # avoiding rounding errors here
+            # We draw the bars over each other as if it was a 2-part vbar, tallest one first.
             cumul_pct.reverse()
             list(color).reverse()
-            for n,p in enumerate(cumul_pct):
-                  
+            for n, p in enumerate(cumul_pct):
+
                 area_pct = p
                 # user inputs the percent of area they want colored so we need to translate that into a percent height
                 if area_pct < 1 / 6:
@@ -192,11 +195,15 @@ def _create_hex(
                     p = height_for_area_calc / (radius * 2)
 
                 elif (area_pct >= 1 / 6) and (area_pct <= 5 / 6):
-                    height_for_area_calc = 2 * radius * ((3 / 4) * area_pct - (1 / 8)) + radius / 2
+                    height_for_area_calc = (
+                        2 * radius * ((3 / 4) * area_pct - (1 / 8)) + radius / 2
+                    )
                     p = height_for_area_calc / (radius * 2)
 
                 else:
-                    height_for_area_calc = 2 * radius - (np.sqrt((1 - area_pct) * (3 / 2)) * radius)
+                    height_for_area_calc = 2 * radius - (
+                        np.sqrt((1 - area_pct) * (3 / 2)) * radius
+                    )
                     p = height_for_area_calc / (radius * 2)
 
                 height = np.sqrt(3) / 2 * radius
@@ -217,27 +224,33 @@ def _create_hex(
                     coord[0] + xoffset,
                     coord[0] + height,
                     coord[0] + height,
-                    ]
+                ]
 
                 ytop = [
                     coord[1],
                     coord[1] + radius / 2,
-                    coord[1] + (radius / (2 * height)) * (height - xoffset) + radius / 2,
+                    coord[1]
+                    + (radius / (2 * height)) * (height - xoffset)
+                    + radius / 2,
                     coord[1] + radius,
-                    coord[1] + (radius / (2 * height)) * (height - xoffset) + radius / 2,
+                    coord[1]
+                    + (radius / (2 * height)) * (height - xoffset)
+                    + radius / 2,
                     coord[1] + radius / 2,
                     coord[1],
-                    ]
+                ]
 
                 ybottom = [
                     coord[1],
                     coord[1] - radius / 2,
-                    coord[1] - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
+                    coord[1]
+                    - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
                     coord[1] - radius,
-                    coord[1] - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
+                    coord[1]
+                    - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
                     coord[1] - radius / 2,
                     coord[1],
-                    ]
+                ]
 
                 if p < 0.25:
                     ymiddle = [
@@ -248,28 +261,28 @@ def _create_hex(
                         ybottom[2],
                         ybottom[1],
                         ybottom[0],
-                           ]
+                    ]
 
-                elif p>=0.25 and p <=0.5:
+                elif p >= 0.25 and p <= 0.5:
                     ymiddle = [
-                    coord[1] - (radius-(2*radius*p)),
-                    coord[1] - (radius-(2*radius*p)),
-                    coord[1] - (radius-(2*radius*p)),
-                    coord[1] - (radius-(2*radius*p)),
-                    coord[1] - (radius-(2*radius*p)),
-                    coord[1] - (radius-(2*radius*p)),
-                    coord[1] - (radius-(2*radius*p))
-                    ] 
-                elif p>0.5 and p <=0.75:
+                        coord[1] - (radius - (2 * radius * p)),
+                        coord[1] - (radius - (2 * radius * p)),
+                        coord[1] - (radius - (2 * radius * p)),
+                        coord[1] - (radius - (2 * radius * p)),
+                        coord[1] - (radius - (2 * radius * p)),
+                        coord[1] - (radius - (2 * radius * p)),
+                        coord[1] - (radius - (2 * radius * p)),
+                    ]
+                elif p > 0.5 and p <= 0.75:
                     ymiddle = [
-                    coord[1] + (2*radius*p-radius),
-                    coord[1] + (2*radius*p-radius),
-                    coord[1] + (2*radius*p-radius),
-                    coord[1] + (2*radius*p-radius),
-                    coord[1] + (2*radius*p-radius),
-                    coord[1] + (2*radius*p-radius),
-                    coord[1] + (2*radius*p-radius),
-                    ] 
+                        coord[1] + (2 * radius * p - radius),
+                        coord[1] + (2 * radius * p - radius),
+                        coord[1] + (2 * radius * p - radius),
+                        coord[1] + (2 * radius * p - radius),
+                        coord[1] + (2 * radius * p - radius),
+                        coord[1] + (2 * radius * p - radius),
+                        coord[1] + (2 * radius * p - radius),
+                    ]
                 else:
                     ymiddle = [
                         ytop[0],
@@ -279,17 +292,17 @@ def _create_hex(
                         ytop[2],
                         ytop[1],
                         ytop[0],
-                        ]
+                    ]
 
                 ax.fill_between(x, ybottom, ymiddle, facecolor=color[n])
-                #ax.fill_between(x, ymiddle, ytop, facecolor=color[1])
+                # ax.fill_between(x, ymiddle, ytop, facecolor=color[1])
                 ax.plot(x, ytop, color=line_color, linewidth=1)
                 ax.plot(x, ybottom, color=line_color, linewidth=1)
-        
-    elif chart_type=='choropleth':
-       
+
+    elif chart_type == "choropleth":
+
         height = np.sqrt(3) / 2 * radius
-        xoffset=height
+        xoffset = height
 
         x = [
             coord[0] - height,
@@ -321,13 +334,12 @@ def _create_hex(
             coord[1],
         ]
 
-        cmap=plt.get_cmap(colormap)
+        cmap = plt.get_cmap(colormap)
         # see for reference https://matplotlib.org/stable/gallery/lines_bars_and_markers/fill_between_demo.html
         ax.fill_between(x, ytop, ybottom, facecolor=cmap(pct))
         ax.plot(x, ytop, color=line_color, linewidth=line_width)
         ax.plot(x, ybottom, color=line_color, linewidth=line_width)
-       
-        
+
     return ax
 
 
@@ -341,18 +353,18 @@ def plot_hex(
     numeric_labels=None,
     numeric_labels_custom=None,
     excluded_states=None,
-    excluded_color='grey',
+    excluded_color="grey",
     # Hex/coloring
     radius=1,
-    color=["#ef476f","#ffd166", "#06d6a0","#118ab2"],
+    color=["#ef476f", "#ffd166", "#06d6a0", "#118ab2"],
     line_color="#ffffff",
     line_width=1,
-    colormap='viridis',
+    colormap="viridis",
     # Text Sizing/Coloring
     size=10,
     text_color="#ffffff",
-    #chart type
-    chart_type='vbar',
+    # chart type
+    chart_type="vbar",
     # Options to save a figure or show figure
     out_path=None,
     show_figure=True,
@@ -394,8 +406,10 @@ def plot_hex(
         try:
             assert type(excluded_states) == list and l in excluded_states
             temp_color = np.repeat(excluded_color, len(color))
+            temp_text_color = "black"
         except:
             temp_color = color
+            temp_text_color = text_color
 
         _create_hex(
             ax,
@@ -406,7 +420,7 @@ def plot_hex(
             line_color=line_color,
             line_width=line_width,
             chart_type=chart_type,
-            colormap=colormap
+            colormap=colormap,
         )
         if numeric_labels:
             if type(numeric_labels) == str:
@@ -421,7 +435,17 @@ def plot_hex(
                     l_new = l
         else:
             l_new = l
-        ax.text(x, y, l_new, ha="center", va="center", size=size, color=text_color)
+
+        ax.text(
+            x,
+            y,
+            l_new,
+            ha="center",
+            va="center",
+            size=size,
+            fontweight="bold",
+            color=temp_text_color,
+        )
 
     plt.axis("off")
     if out_path:
@@ -436,16 +460,16 @@ def us_plot_hex(
     numeric_labels=None,
     numeric_labels_custom=None,
     excluded_states=None,
-    excluded_color='grey',
+    excluded_color="grey",
     radius=1,
     size=10,
-    color=["#ef476f","#ffd166", "#06d6a0","#118ab2"],
+    color=["#ef476f", "#ffd166", "#06d6a0", "#118ab2"],
     line_color="#ffffff",
     line_width=1,
     text_color="#ffffff",
-    #chart type
-    chart_type='vbar',
-    colormap='veridis',
+    # chart type
+    chart_type="vbar",
+    colormap="veridis",
     # figsize=(8, 5),
     show_figure=True,
     **kwargs,
