@@ -17,7 +17,6 @@ def _read_user_input(user_input):
     """
     # Will delete this once we make all test cases
     # does the input have all 50 states?
-    # assert type(user_input) == 'kevin'
     if isinstance(user_input, pd.core.frame.DataFrame):
         values = user_input
     else:
@@ -34,8 +33,7 @@ def _read_user_input(user_input):
             values = pd.DataFrame(user_input)
         # except:
         #     raise "Help! I can't find the data and don't want to be here"
-
-    values.columns = ["state", "value"]
+    values=values.rename(columns={values.columns[0]:"state", values.columns[1]:"value"})
     # users can input either a single float between 0-1 or a list of numerical values
     # ast.literal_eval is picky about which datatypes it evals so we convert to string first 
     #so that the value can become either number or list
