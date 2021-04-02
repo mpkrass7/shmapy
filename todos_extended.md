@@ -12,7 +12,6 @@
 - Users can pass dataframe with extra states
 
 
-
 ## Completed
 - Users can supply custom cooridnates for the hexagons -- Done
 - Users can fill hexagons on a gradient -- Done
