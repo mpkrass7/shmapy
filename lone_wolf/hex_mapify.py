@@ -2,6 +2,7 @@ import math
 from numpy.core import numeric
 import pandas as pd
 import numpy as np
+import copy
 import matplotlib.pyplot as plt
 from lone_wolf.input import (
     _read_user_input,
@@ -351,7 +352,7 @@ def plot_hex(
     pct,
     # TODO add this argument to the README
     numeric_labels=None,
-    numeric_labels_custom=None,
+    numeric_labels_custom=None, #let's have this be the location of the custom labels in the df
     excluded_states=None,
     excluded_color="grey",
     # Hex/coloring
@@ -400,9 +401,9 @@ def plot_hex(
     :type out_path: [type], optional
     """
     fig, ax = plt.subplots(**kwargs)
-
-    for x, y, p, l, nm in zip(hcoord, vcoord, pct, labels, numeric_labels_custom):
-
+    i=0
+    for x, y, p, l in zip(hcoord, vcoord, pct, labels):
+        
         try:
             assert type(excluded_states) == list and l in excluded_states
             temp_color = np.repeat(excluded_color, len(color))
@@ -410,7 +411,6 @@ def plot_hex(
         except:
             temp_color = color
             temp_text_color = text_color
-
         _create_hex(
             ax,
             [x, y],
@@ -422,19 +422,24 @@ def plot_hex(
             chart_type=chart_type,
             colormap=colormap,
         )
+        
+        l_new = l
         if numeric_labels:
+            #numeric labels can be a string called 'all'
+            #if it’s all, it adds the percent fill label on the chart for every state
+            #if it’s a list, it adds the % label for each state on the list
+            #else it just labels the state
             if type(numeric_labels) == str:
                 if numeric_labels.lower() == "all":
                     l_new = l + f"\n {str(round(p*100))}%"
             elif len(numeric_labels) >= 1:
-                if nm and l in numeric_labels:
-                    l_new = l + f"\n {nm}"
-                elif l in numeric_labels:
-                    l_new = l + f"\n {str(round(p*100))}%"
+                if numeric_labels_custom[i] and l in numeric_labels:
+                    l_new = l + f"\n {numeric_labels_custom[i]}"
                 else:
-                    l_new = l
-        else:
-            l_new = l
+                    l_new = l + f"\n {str(round(p*100))}%"
+
+        if numeric_labels_custom is not None:
+            l_new= numeric_labels_custom[i]
 
         ax.text(
             x,
@@ -446,6 +451,7 @@ def plot_hex(
             fontweight="bold",
             color=temp_text_color,
         )
+        i+=1
 
     plt.axis("off")
     if out_path:
@@ -469,7 +475,7 @@ def us_plot_hex(
     text_color="#ffffff",
     # chart type
     chart_type="vbar",
-    colormap="veridis",
+    colormap="viridis",
     # figsize=(8, 5),
     show_figure=True,
     **kwargs,
@@ -500,20 +506,22 @@ def us_plot_hex(
     :return: [description]
     :rtype: [type]
     """
-
     coordinate_df = _read_coordinate_file()
     input_df = _read_user_input(input_df)
-    input_df.columns = ["state", "pct"]
+    input_df=input_df.rename(columns={input_df.columns[0]:'state', input_df.columns[1]:'pct'})
 
-    dataset = coordinate_df.merge(input_df, left_on="Abbreviation", right_on="state")[
-        ["Abbreviation", "X", "Y", "pct"]
-    ]
+    dataset = coordinate_df.merge(input_df, left_on="Abbreviation", right_on="state")
+    #[
+    #    ["Abbreviation", "X", "Y", "pct"]
+    #]
 
     l, h, v = _extract_coordinates(dataset)
 
     if numeric_labels_custom:
-        custom_labels = dataset.Abbreviation.map(numeric_labels_custom)
-
+        custom_labels= dataset[numeric_labels_custom]
+    else:
+        custom_labels=None
+    
     return plot_hex(
         h,
         v,
