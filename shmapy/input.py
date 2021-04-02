@@ -78,6 +78,8 @@ def input_validator(values):
     # if the values aren't lists, we rescale each value to be between 0 and 1 with min and max set by the whole dataset.
     # if there are list values, that means the user wants a stacked bar chart, and each list is set to sum to 1 in hexmapify.
     # actually I do not think this should be part of the input validation.
+
+    # TODO: move rescaling somewhere else
     if sum([type(i) == list for i in values.value]) == 0:
         try:
             assert max(values.value) <= 1 and min(values.value) >= 0

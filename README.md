@@ -4,13 +4,13 @@ The fabulous (soon to be) package for building a United States hex map with opti
 ## Install
 
 Install from source:  
-`git clone git@github.com:mpkrass7/lone_wolf.git`  
+`git clone git@github.com:mpkrass7/shmapy.git`  
 `python setup.py install` 
 
 ## Usage
 
 ```bash
-head -10 lone_wolf/static/demo_input1.csv
+head -10 shmapy/static/demo_input1.csv
 
 AK,0.448415868
 AL,0.178259515
@@ -24,26 +24,27 @@ DE,0.241586764
 FL,0.040757232
 ```
 
-`lone_wolf plot-hex static/demo_input1.csv`
+`shmapy plot-hex static/demo_input1.csv`
 
-![](./lone_wolf/img/hex_out.png)
+![](./shmapy/img/hex_out.png)
 
-`lone_wolf plot-hex static/demo_input1.csv -numeric_labels=all -size=8`
+`shmapy plot-hex static/demo_input1.csv -numeric_labels=all -size=8`
 
-![](./lone_wolf/img/hex_out_label.png)
+![](./shmapy/img/hex_out_label.png)
 
 Resizse plot (**kwargs get passed to matplotlib.pyplot.subplots())
 
-`lone_wolf plot-hex static/demo_input1.csv -size=3 -figsize="(3,2)"`
+`shmapy plot-hex static/demo_input1.csv -size=3 -figsize="(3,2)"`
 
-![](./lone_wolf/img/hex_out_resize.png)
+![](./shmapy/img/hex_out_resize.png)
 
 **Special Credits to Kevin Arvai for building the real infrastructure on this package and Gregory Michaelson for figuring out everything hexagon**
 
 ## To Do Items:
-- Users can fill hexagons with constant color rather than percent fill
+- Users can supply a categorical fill
+- Users can optionally exclude states (filling in an arbitrary color)
 - Users can supply custom cooridnates for the hexagons -- Done
-- Users can fill hexagons on a gradient
+- Users can fill hexagons on a gradient -- Done
 - Users have **kwargs access to plot output to optionally include axes, title etc.. -- Some Kwargs are here!
 - Users can customize which states are filled
 - Users can supply values underneath state label -- Done
