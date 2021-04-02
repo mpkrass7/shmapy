@@ -13,10 +13,10 @@ with copen(os.path.join(here, "requirements.txt"), encoding="utf-8") as f:
 install_requires = [x.strip() for x in all_reqs if "git+" not in x]
 
 setup(
-    name="lone_wolf",
+    name="shmapy",
     version="0.1",
     packages=[
-        "lone_wolf",
+        "shmapy",
     ],
     license="Creative Commons Attribution-Noncommercial-Share Alike license",
     long_description=open("README.md").read(),
