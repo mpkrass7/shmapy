@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
 
-from lone_wolf.input import (
+from shmapy.input import (
     _read_user_input,
     _read_coordinate_file,
     _extract_coordinates,

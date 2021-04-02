@@ -1,6 +1,6 @@
 import numpy as np
 import string
-from lone_wolf.hex_mapify import plot_hex
+from shmapy.hex_mapify import plot_hex
 
 # Generate hexagons next to each other
 coord = [
@@ -35,4 +35,3 @@ plot_hex(
     # numeric_labels=numeric_labels,
     figsize=(5, 5),
 )
-

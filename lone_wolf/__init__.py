@@ -1,1 +1,0 @@
-__project__ = "lone_wolf"

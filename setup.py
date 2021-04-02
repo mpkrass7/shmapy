@@ -2,7 +2,7 @@ import os
 
 from codecs import open as copen
 from setuptools import setup
-from lone_wolf import __project__
+from shmapy import __project__
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -25,7 +25,6 @@ setup(
     entry_points={
         "console_scripts": [
             f"{__project__} = {__project__}.__main__:main",
-            f"lone-wolf = {__project__}.__main__:main",
         ]
     },
 )
