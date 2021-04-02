@@ -10,14 +10,14 @@ from pandas.errors import ParserError
 project_directory = Path(__file__).parent
 
 
-def _read_user_input(user_input):
+def _read_user_input(user_input) -> pd.DataFrame:
     """
     Accepts dataframe, numpy array dictionary or path to a csv or xlsx file
     Outputs file type converted to pandas dataframe
     """
     # Will delete this once we make all test cases
     # does the input have all 50 states?
-    # assert type(user_input) == 'kevin'
+
     if isinstance(user_input, pd.core.frame.DataFrame):
         values = user_input
     else:
@@ -37,8 +37,8 @@ def _read_user_input(user_input):
 
     values.columns = ["state", "value"]
     # users can input either a single float between 0-1 or a list of numerical values
-    # ast.literal_eval is picky about which datatypes it evals so we convert to string first 
-    #so that the value can become either number or list
+    # ast.literal_eval is picky about which datatypes it evals so we convert to string first
+    # so that the value can become either number or list
     values["value"] = values.value.astype(str)
     values["value"] = values.value.apply(ast.literal_eval)
     # convert to state abbreviations
@@ -57,7 +57,7 @@ def read_user_coordinates(df):
     # Read in of X, Y, label coordinates for hexagons
     df.columns = ["X", "Y", "Abbreviation"]
 
-    # l, h, v = _extract_coordinates(df)
+    l, h, v = _extract_coordinates(df)
 
     return l, h, v
 
@@ -74,10 +74,10 @@ def input_validator(values):
         Map will have missing hexagons
          """
         )
-    #if the values aren't lists, we rescale each value to be between 0 and 1 with min and max set by the whole dataset.
-    #if there are list values, that means the user wants a stacked bar chart, and each list is set to sum to 1 in hexmapify.
-    #actually I do not think this should be part of the input validation.
-    if sum([type(i)==list for i in values.value])==0:
+    # if the values aren't lists, we rescale each value to be between 0 and 1 with min and max set by the whole dataset.
+    # if there are list values, that means the user wants a stacked bar chart, and each list is set to sum to 1 in hexmapify.
+    # actually I do not think this should be part of the input validation.
+    if sum([type(i) == list for i in values.value]) == 0:
         try:
             assert max(values.value) <= 1 and min(values.value) >= 0
         except AssertionError:
@@ -116,4 +116,3 @@ def state_to_abbreviation(values):
     )
 
     return values
-
