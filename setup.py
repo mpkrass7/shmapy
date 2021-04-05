@@ -2,7 +2,8 @@ import os
 
 from codecs import open as copen
 from setuptools import setup
-from shmapy import __project__
+
+__project__ = "shmapy"
 
 here = os.path.abspath(os.path.dirname(__file__))
 
