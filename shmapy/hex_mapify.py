@@ -440,7 +440,7 @@ def plot_hex(
                     l_new = l + f"\n {str(round(p*100))}%"
 
         if numeric_labels_custom is not None:
-            l_new = numeric_labels_custom[i]
+            l_new = l + "\n" + numeric_labels_custom[i]
 
         ax.text(
             x,
