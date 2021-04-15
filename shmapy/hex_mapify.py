@@ -525,7 +525,7 @@ def us_plot_hex(
         custom_labels = dataset[numeric_labels_custom]
     else:
         custom_labels = None
-    logger.info('Kevin is scrb')
+
     return plot_hex(
         h,
         v,
