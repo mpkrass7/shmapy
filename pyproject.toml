@@ -1,0 +1,10 @@
+[project]
+name = "shmapy"
+description = "The most amazing package for building hex maps"
+version = "0.2.0"
+updated = 2021-04-15
+authors = "Marshall Krassenstein, Kevin Arvai, Adrian Ruskin, Greg Michaelson"
+
+[build-system]
+requires = ["setuptools >= 40.9.0", "wheel"]
+build-backend = "setuptools.build_meta"
