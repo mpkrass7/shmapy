@@ -7,6 +7,3 @@ def main():
         {"plot-hex": us_plot_hex,}
     )
 
-
-if __name__ == "__main__":
-    main()

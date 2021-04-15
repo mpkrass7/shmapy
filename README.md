@@ -24,20 +24,27 @@ DE,0.241586764
 FL,0.040757232
 ```
 
-`shmapy plot-hex static/demo_input1.csv`
+`shmapy plot-hex static/demo_input1.csv -color="['blue','green']"`
 
-![](./shmapy/img/hex_out.png)
+![](./shmapy/img/hex_out_demo1.png)
+
+Add percent fill labels to the plot automatically
 
 `shmapy plot-hex static/demo_input1.csv -numeric_labels=all -size=8`
 
-![](./shmapy/img/hex_out_label.png)
+![](./shmapy/img/hex_out_demo1_label.png)
 
-Resizse plot (**kwargs get passed to matplotlib.pyplot.subplots())
+Resize plot (**kwargs get passed to matplotlib.pyplot.subplots())
 
 `shmapy plot-hex static/demo_input1.csv -size=3 -figsize="(3,2)"`
 
-![](./shmapy/img/hex_out_resize.png)
+![](./shmapy/img/hex_out_demo1_resize.png)
 
+Plot more than two colors
+
+`shmapy plot-hex static/demo_input3.csv`
+
+![](./shmapy/img/hex_out_demo3.png)
 ## Input Dataframe
 
 shmapy takes an input dataframe with at least two columns. The first column is

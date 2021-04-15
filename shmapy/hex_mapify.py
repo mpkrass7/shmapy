@@ -38,10 +38,8 @@ def _create_hex(
         [description]
     pct : [type]
         [description]
-    fill_color : str, optional
-        [description], by default "#1d3557"
-    top_color : str, optional
-        [description], by default "#e63946"
+    color : str, optional
+        The fill of the hexagon, bottom is first color in list, second is second color and so on..
     line_color : str, optional
         [description], by default "#ffffff"
 
