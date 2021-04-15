@@ -3,6 +3,7 @@ from numpy.core import numeric
 import pandas as pd
 import numpy as np
 import copy
+from logzero import logger
 import matplotlib.pyplot as plt
 from shmapy.input import (
     _read_user_input,
@@ -524,7 +525,7 @@ def us_plot_hex(
         custom_labels = dataset[numeric_labels_custom]
     else:
         custom_labels = None
-
+    logger.info('Kevin is scrb')
     return plot_hex(
         h,
         v,
