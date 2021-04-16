@@ -9,9 +9,59 @@ from shmapy.input import (
     _read_user_input,
     _read_coordinate_file,
     _extract_coordinates,
-    input_validator,
-    state_to_abbreviation,
 )
+
+
+def _set_x(coord, height):
+    x = [
+        coord - height,
+        coord - height,
+        coord - height,
+        coord,
+        coord + height,
+        coord + height,
+        coord + height,
+    ]
+    return x
+
+
+def _set_y(coord, radius):
+
+    ytop = [
+        coord,
+        coord + radius / 2,
+        coord + radius / 2,
+        coord + radius,
+        coord + radius / 2,
+        coord + radius / 2,
+        coord,
+    ]
+
+    ybottom = [
+        coord,
+        coord - radius / 2,
+        coord - radius / 2,
+        coord - radius,
+        coord - radius / 2,
+        coord - radius / 2,
+        coord,
+    ]
+    return ytop, ybottom
+
+
+def _handle_categories(value_list, fill_color, categorical_order=None) -> list:
+    if categorical_order:
+        assert len(fill_color) >= len(categorical_order)
+        fill_color = fill_color[: len(categorical_order)]
+        logger.info(fill_color)
+        color_mapper = dict(zip(categorical_order, fill_color))
+
+    else:
+        # If no order is supplied we'll just do things in order
+        assert len(fill_color) >= len(set(value_list))
+        fill_color = fill_color[: len(set(value_list))]
+        color_mapper = dict(zip(set(value_list), fill_color))
+    return [color_mapper[i] for i in value_list]
 
 
 def _create_hex(
@@ -20,11 +70,12 @@ def _create_hex(
     radius,
     pct,
     # color=["#1d3557","#e63946"],
-    color=["#ef476f", "#ffd166", "#06d6a0", "#118ab2"],
+    fill_color=["#ef476f", "#ffd166", "#06d6a0", "#118ab2"],
     line_color="#ffffff",
     line_width=1,
     chart_type="vbar",
     colormap="viridis",
+    categorical_order=None,
 ):
     """[summary]
 
@@ -38,7 +89,7 @@ def _create_hex(
         [description]
     pct : [type]
         [description]
-    color : str, optional
+    fill_color : str, optional
         The fill of the hexagon, bottom is first color in list, second is second color and so on..
     line_color : str, optional
         [description], by default "#ffffff"
@@ -55,8 +106,7 @@ def _create_hex(
     if type(pct) == list:
         if len(pct) == 1:
             pct = pct[0]
-
-    assert chart_type in ["vbar", "choropleth"]
+    assert chart_type in ["vbar", "choropleth", "categorical"]
 
     if chart_type == "vbar":
 
@@ -166,8 +216,8 @@ def _create_hex(
                     ytop[0],
                 ]
 
-            ax.fill_between(x, ybottom, ymiddle, facecolor=color[0])
-            ax.fill_between(x, ymiddle, ytop, facecolor=color[1])
+            ax.fill_between(x, ybottom, ymiddle, facecolor=fill_color[0])
+            ax.fill_between(x, ymiddle, ytop, facecolor=fill_color[1])
             ax.plot(x, ytop, color=line_color, linewidth=line_width)
             ax.plot(x, ybottom, color=line_color, linewidth=line_width)
 
@@ -185,7 +235,7 @@ def _create_hex(
             cumul_pct.append(1.0)  # avoiding rounding errors here
             # We draw the bars over each other as if it was a 2-part vbar, tallest one first.
             cumul_pct.reverse()
-            list(color).reverse()
+            list(fill_color).reverse()
             for n, p in enumerate(cumul_pct):
 
                 area_pct = p
@@ -294,51 +344,32 @@ def _create_hex(
                         ytop[0],
                     ]
 
-                ax.fill_between(x, ybottom, ymiddle, facecolor=color[n])
+                ax.fill_between(x, ybottom, ymiddle, facecolor=fill_color[n])
                 # ax.fill_between(x, ymiddle, ytop, facecolor=color[1])
                 ax.plot(x, ytop, color=line_color, linewidth=1)
                 ax.plot(x, ybottom, color=line_color, linewidth=1)
 
     elif chart_type == "choropleth":
-
         height = np.sqrt(3) / 2 * radius
-        xoffset = height
 
-        x = [
-            coord[0] - height,
-            coord[0] - height,
-            coord[0] - height,
-            coord[0],
-            coord[0] + height,
-            coord[0] + height,
-            coord[0] + height,
-        ]
-
-        ytop = [
-            coord[1],
-            coord[1] + radius / 2,
-            coord[1] + radius / 2,
-            coord[1] + radius,
-            coord[1] + radius / 2,
-            coord[1] + radius / 2,
-            coord[1],
-        ]
-
-        ybottom = [
-            coord[1],
-            coord[1] - radius / 2,
-            coord[1] - radius / 2,
-            coord[1] - radius,
-            coord[1] - radius / 2,
-            coord[1] - radius / 2,
-            coord[1],
-        ]
+        x = _set_x(coord[0], height)
+        ytop, ybottom = _set_y(coord[1], radius)
 
         cmap = plt.get_cmap(colormap)
         # see for reference https://matplotlib.org/stable/gallery/lines_bars_and_markers/fill_between_demo.html
         ax.fill_between(x, ytop, ybottom, facecolor=cmap(pct))
         ax.plot(x, ytop, color=line_color, linewidth=line_width)
         ax.plot(x, ybottom, color=line_color, linewidth=line_width)
+
+    else:
+        height = np.sqrt(3) / 2 * radius
+        x = _set_x(coord[0], height)
+        ytop, ybottom = _set_y(coord[1], radius)
+
+        ax.fill_between(x, ytop, ybottom, facecolor=pct)
+        ax.plot(x, ytop, color=line_color, linewidth=line_width)
+        ax.plot(x, ybottom, color=line_color, linewidth=line_width)
+        # assert 2 + 2 == 5
 
     return ax
 
@@ -349,24 +380,25 @@ def plot_hex(
     vcoord,
     labels,
     pct,
-    # TODO add this argument to the README
-    numeric_labels=None,
-    numeric_labels_custom=None,  # let's have this be the location of the custom labels in the df
-    # TODO: Remove excluded states as an argument and remap to throw in missing states
-    excluded_states=None,
+    # chart type
+    chart_type="vbar",
     excluded_color="grey",
     # Hex/coloring
     radius=1,
-    color=["#ef476f", "#ffd166", "#06d6a0", "#118ab2"],
+    fill_color=["#ef476f", "#ffd166", "#06d6a0", "#118ab2"],
     line_color="#ffffff",
     line_width=1,
     colormap="viridis",
     # Text Sizing/Coloring
     size=10,
     text_color="#ffffff",
-    # chart type
-    chart_type="vbar",
     # Options to save a figure or show figure
+    # TODO add this argument to the README
+    numeric_labels=None,
+    numeric_labels_custom=None,  # let's have this be the location of the custom labels in the df
+    # TODO: Remove excluded states as an argument and remap to throw in missing states
+    excluded_states=None,
+    categorical_order=None,
     out_path=None,
     show_figure=True,
     **kwargs,
@@ -402,25 +434,32 @@ def plot_hex(
     """
     fig, ax = plt.subplots(**kwargs)
     i = 0
+
+    if chart_type == "categorical":
+        pct = _handle_categories(
+            pct, fill_color=fill_color, categorical_order=categorical_order
+        )
+
     for x, y, p, l in zip(hcoord, vcoord, pct, labels):
 
         try:
             assert type(excluded_states) == list and l in excluded_states
-            temp_color = np.repeat(excluded_color, len(color))
+            temp_color = np.repeat(excluded_color, len(fill_color))
             temp_text_color = "black"
         except:
-            temp_color = color
+            temp_color = fill_color
             temp_text_color = text_color
         _create_hex(
             ax,
             [x, y],
             radius=radius,
             pct=p,
-            color=temp_color,
+            fill_color=temp_color,
             line_color=line_color,
             line_width=line_width,
             chart_type=chart_type,
             colormap=colormap,
+            categorical_order=categorical_order,
         )
 
         l_new = l
@@ -462,22 +501,22 @@ def plot_hex(
 
 def us_plot_hex(
     input_df,
+    chart_type="vbar",
+    excluded_color="grey",
+    radius=1,
+    size=10,
+    fill_color=["#ef476f", "#ffd166", "#06d6a0", "#118ab2", "black", "white"],
+    line_color="#ffffff",
+    line_width=1,
+    text_color="#ffffff",
+    colormap="viridis",
+    # figsize=(8, 5),
+    show_figure=True,
     out_path=None,
     numeric_labels=None,
     numeric_labels_custom=None,
     excluded_states=None,
-    excluded_color="grey",
-    radius=1,
-    size=10,
-    color=["#ef476f", "#ffd166", "#06d6a0", "#118ab2"],
-    line_color="#ffffff",
-    line_width=1,
-    text_color="#ffffff",
-    # chart type
-    chart_type="vbar",
-    colormap="viridis",
-    # figsize=(8, 5),
-    show_figure=True,
+    categorical_order=None,
     **kwargs,
 ):
     """
@@ -507,16 +546,12 @@ def us_plot_hex(
     :rtype: [type]
     """
     coordinate_df = _read_coordinate_file()
-    input_df = _read_user_input(input_df)
+    input_df = _read_user_input(input_df, chart_type=chart_type)
     input_df = input_df.rename(
         columns={input_df.columns[0]: "state", input_df.columns[1]: "pct"}
     )
 
     dataset = coordinate_df.merge(input_df, left_on="Abbreviation", right_on="state")
-    # [
-    #    ["Abbreviation", "X", "Y", "pct"]
-    # ]
-
     l, h, v = _extract_coordinates(dataset)
 
     if numeric_labels_custom:
@@ -529,20 +564,21 @@ def us_plot_hex(
         v,
         l,
         dataset.pct,
-        numeric_labels=numeric_labels,
-        numeric_labels_custom=custom_labels,
-        excluded_states=excluded_states,
-        excluded_color=excluded_color,
+        chart_type=chart_type,
         radius=radius,
         size=size,
-        color=color,
+        fill_color=fill_color,
         line_color=line_color,
         line_width=line_width,
         text_color=text_color,
         # figsize=figsize,
-        chart_type=chart_type,
         colormap=colormap,
         out_path=out_path,
         show_figure=show_figure,
+        numeric_labels=numeric_labels,
+        numeric_labels_custom=custom_labels,
+        excluded_color=excluded_color,
+        excluded_states=excluded_states,
+        categorical_order=categorical_order,
         **kwargs,
     )

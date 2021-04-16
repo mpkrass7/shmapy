@@ -24,6 +24,8 @@ DE,0.241586764
 FL,0.040757232
 ```
 
+Play with colors
+
 `shmapy plot-hex static/demo_input1.csv -color="['blue','green']"`
 
 ![](./shmapy/img/hex_out_demo1.png)
@@ -45,6 +47,21 @@ Plot more than two colors
 `shmapy plot-hex static/demo_input3.csv`
 
 ![](./shmapy/img/hex_out_demo3.png)
+
+Plot a choropleth
+
+`shmapy plot-hex static/demo_input.csv -chart_type="choropleth"`
+
+
+![](./shmapy/img/hex_out_demo1_choropleth.png)
+
+Plot a category
+
+`shmapy plot-hex static/demo_input5.csv -chart_type="categorical"`
+
+![](./shmapy/img/hex_out_demo5.png)
+
+
 ## Input Dataframe
 
 shmapy takes an input dataframe with at least two columns. The first column is
