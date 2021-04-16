@@ -53,7 +53,6 @@ def _handle_categories(value_list, fill_color, categorical_order=None) -> list:
     if categorical_order:
         assert len(fill_color) >= len(categorical_order)
         fill_color = fill_color[: len(categorical_order)]
-        logger.info(fill_color)
         color_mapper = dict(zip(categorical_order, fill_color))
 
     else:

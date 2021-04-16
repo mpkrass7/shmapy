@@ -11,14 +11,17 @@ from shmapy.input import (
 
 
 @pytest.mark.parametrize(
-    "filename",
+    "filename,chart_type",
     [
-        "tests/data/demo_input1.csv",
-        "tests/data/demo_input2.csv",
-        "tests/data/demo_input3.csv",
-        "tests/data/demo_input4.csv",
+        ("tests/data/demo_input1.csv", None),
+        ("tests/data/demo_input2.csv", None),
+        ("tests/data/demo_input3.csv", None),
+        ("tests/data/demo_input4.csv", None),
+        ("tests/data/demo_input5.csv", "categorical"),
     ],
 )
-def test_read_user_input(filename):
+def test_read_user_input(filename, chart_type):
 
-    assert isinstance(_read_user_input(filename), pd.core.frame.DataFrame)
+    assert isinstance(
+        _read_user_input(filename, chart_type=chart_type), pd.core.frame.DataFrame
+    )
