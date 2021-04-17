@@ -1,1 +1,1 @@
-from shmapy.hex_mapify import plot_hex, us_plot_hex
+from shmapy.hex_mapify import us_plot_hex

@@ -1,43 +1,43 @@
-state, value
-Hawaii,0.565490017
-Florida,0.040757232
-Texas,0.194516385
-Georgia,0.375185295
-New Mexico,0.700539089
-Oklahoma,0.21831074
-Louisiana,0.642629176
-Mississippi,0.497548243
-Alabama,0.178259515
-South Carolina,0.962807593
-Tennessee,0.757467663
-Virginia,0.655101566
-North Carolina,0.76924375
-District of Columbia,0.171112619
-Oregon,0.892160432
-Nevada,0.238318882
-Colorado,0.179617281
-Nebraska,0.280002083
-Missouri,0.454294502
-Kentucky,0.372837122
-West Virginia,0.763894339
-Maryland,0.890769622
-Delaware,0.241586764
-Idaho,0.139811229
-Wyoming,0.743278936
-South Dakota,0.297672544
-Iowa,0.303357347
-Connecticut,0.1960641
-Washington,0.85803585
-Montana,0.253463178
-North Dakota,0.760262409
-Minnesota,0.5512643
-Wisconsin,0.901715287
-Michigan,0.294085828
-New York,0.622963452
-Massachusetts,0.935420611
-Rhode Island,0.149620803
-Vermont,0.151357063
-New Hampshire,0.870585954
-Alaska,0.448415868
-Maine,0.320116444
-California,0
+state, value,fruit
+Hawaii,0.565490017,Durian
+Florida,0.040757232,Cherry
+Texas,0.194516385,Apple
+Georgia,0.375185295,Durian
+New Mexico,0.700539089,Banana
+Oklahoma,0.21831074,Apple
+Louisiana,0.642629176,Cherry
+Mississippi,0.497548243,Elderberry
+Alabama,0.178259515,Banana
+South Carolina,0.962807593,Cherry
+Tennessee,0.757467663,Elderberry
+Virginia,0.655101566,Elderberry
+North Carolina,0.76924375,Elderberry
+District of Columbia,0.171112619,Apple
+Oregon,0.892160432,Apple
+Nevada,0.238318882,Elderberry
+Colorado,0.179617281,Cherry
+Nebraska,0.280002083,Elderberry
+Missouri,0.454294502,Banana
+Kentucky,0.372837122,Banana
+West Virginia,0.763894339,Durian
+Maryland,0.890769622,Apple
+Delaware,0.241586764,Elderberry
+Idaho,0.139811229,Durian
+Wyoming,0.743278936,Apple
+South Dakota,0.297672544,Elderberry
+Iowa,0.303357347,Elderberry
+Connecticut,0.1960641,Banana
+Washington,0.85803585,Banana
+Montana,0.253463178,Durian
+North Dakota,0.760262409,Cherry
+Minnesota,0.5512643,Durian
+Wisconsin,0.901715287,Cherry
+Michigan,0.294085828,Banana
+New York,0.622963452,Cherry
+Massachusetts,0.935420611,Apple
+Rhode Island,0.149620803,Apple
+Vermont,0.151357063,Elderberry
+New Hampshire,0.870585954,Banana
+Alaska,0.448415868,Elderberry
+Maine,0.320116444,Cherry
+California,0,Banana
