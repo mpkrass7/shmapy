@@ -13,10 +13,10 @@ from shmapy.input import (
 @pytest.mark.parametrize(
     "filename,chart_type",
     [
-        ("tests/data/demo_input1.csv", None),
-        ("tests/data/demo_input2.csv", None),
-        ("tests/data/demo_input3.csv", None),
-        ("tests/data/demo_input4.csv", None),
+        ("tests/data/demo_input1.csv", "vbar"),
+        ("tests/data/demo_input2.csv", "vbar"),
+        ("tests/data/demo_input3.csv", "vbar"),
+        ("tests/data/demo_input4.csv", "vbar"),
         ("tests/data/demo_input5.csv", "categorical"),
     ],
 )
