@@ -1,6 +1,6 @@
 import numpy as np
 import string
-from shmapy.hex_mapify import plot_hex
+from shmapy.hex_shmap import plot_hex
 
 # Generate hexagons next to each other
 coord = [
