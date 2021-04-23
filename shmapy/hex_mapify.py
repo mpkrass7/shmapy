@@ -59,7 +59,12 @@ def _set_y(coord, radius):
     return ytop, ybottom
 
 
-def _handle_categories(value_list, fill_color, categorical_order=None) -> list:
+def _handle_categories(
+    value_list, fill_color, chart_type, categorical_order=None
+) -> list:
+    if chart_type != "categorical":
+        return value_list
+
     if categorical_order:
         assert len(fill_color) >= len(categorical_order)
         fill_color = fill_color[: len(categorical_order)]
@@ -188,11 +193,9 @@ def _create_vbar_hex(
         ybottom = [
             coord[1],
             coord[1] - radius / 2,
-            coord[1]
-            - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
+            coord[1] - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
             coord[1] - radius,
-            coord[1]
-            - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
+            coord[1] - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
             coord[1] - radius / 2,
             coord[1],
         ]
@@ -386,14 +389,7 @@ def _create_choropleth_hex(
 
 
 def _create_categorical_hex(
-    ax,
-    coord,
-    radius,
-    pct,
-    # color=["#1d3557","#e63946"],
-    fill_color=["#ef476f", "#ffd166", "#06d6a0", "#118ab2"],
-    line_color="#ffffff",
-    line_width=1,
+    ax, coord, radius, pct, line_color="#ffffff", line_width=1,
 ):
 
     height = np.sqrt(3) / 2 * radius
@@ -406,12 +402,13 @@ def _create_categorical_hex(
     return ax
 
 
-def plot_vbar_hex(
+def plot_hex(
     # Data
     hcoord,
     vcoord,
     labels,
     pct,
+    chart_type,
     excluded_color="grey",
     fill_color=["#ef476f", "#ffd166", "#06d6a0", "#118ab2"],
     # TODO: Remove excluded states as an argument and remap to throw in missing states
@@ -451,205 +448,41 @@ def plot_vbar_hex(
     :param out_path: [description], defaults to None
     :type out_path: [type], optional
     """
+    assert chart_type in ["vbar", "choropleth", "categorical"]
+
     fig, ax = plt.subplots(**kwargs)
     i = 0
-
-    size, line_color, line_width, radius = (
+    (
+        size,
+        line_color,
+        line_width,
+        radius,
+        categorical_order,
+        excluded_states,
+        excluded_color,
+        colormap,
+    ) = (
         hex_kwargs.get("text_color"),
         hex_kwargs.get("line_color"),
         hex_kwargs.get("line_wdith"),
         hex_kwargs.get("radius"),
+        hex_kwargs.get("categorical_order"),
+        hex_kwargs.get("excluded_states"),
+        hex_kwargs.get("excluded_color"),
+        hex_kwargs.get("colormap"),
     )
+
     text_color, numeric_labels, numeric_labels_custom = (
         text_kwargs.get("text_color"),
         text_kwargs.get("numeric_labels"),
         text_kwargs.get("numeric_labels_custom"),
     )
-    for x, y, p, l in zip(hcoord, vcoord, pct, labels):
 
-        try:
-            assert type(excluded_states) == list and l in excluded_states
-            temp_color = np.repeat(excluded_color, len(fill_color))
-            temp_text_color = "black"
-        except:
-            temp_color = fill_color
-            temp_text_color = text_color
-        _create_vbar_hex(
-            ax,
-            [x, y],
-            radius=radius,
-            pct=p,
-            fill_color=temp_color,
-            line_color=line_color,
-            line_width=line_width,
-        )
-
-        l_new = _handle_numeric_labels(l, p, i, numeric_labels, numeric_labels_custom)
-
-        ax.text(
-            x,
-            y,
-            l_new,
-            ha="center",
-            va="center",
-            size=size,
-            fontweight="bold",
-            family="monospace",
-            color=temp_text_color,
-        )
-        i += 1
-
-    plt.axis("off")
-    if out_path:
-        plt.savefig(out_path, bbox_inches="tight", dpi=300)
-    if show_figure:
-        plt.show()
-
-
-def plot_choropleth_hex(
-    hcoord,
-    vcoord,
-    labels,
-    pct,
-    colormap="viridis",
-    out_path=None,
-    show_figure=True,
-    hex_kwargs=default_hex_args,
-    text_kwargs=default_text_args,
-    **kwargs,
-):
-    """
-    Plotting function that takes in a set of x coordinates, y coordinates, labels, and values
-    to generate a hex map with some level of fill.
-
-    :param hcoord: Horizontal Coordinate of the hexagon
-    :type hcoord: numeric
-    :param vcoord: Vertical Coordinate of the hexagon
-    :type vcoord: numeric
-    :param labels: [Labels to go inside the hexagon]
-    :type labels: str
-    :param pct: value (0-1) that a hexgon will be filled on
-    :type pct: float
-    :param radius: Radius of hexagon, defaults to 1
-    :type radius: int, optional
-    :param size: Size of labels, defaults to 10
-    :type size: int, optional
-    :param line_color: [description], defaults to "#ffffff"
-    :type line_color: str, optional
-    :param text_color: [description], defaults to "#ffffff"
-    :type text_color: str, optional
-    :param figsize: [description], defaults to (8, 5)
-    :type figsize: tuple, optional
-    :param out_path: [description], defaults to None
-    :type out_path: [type], optional
-    """
-    fig, ax = plt.subplots(**kwargs)
-    size, line_color, line_width, radius = (
-        hex_kwargs.get("text_color"),
-        hex_kwargs.get("line_color"),
-        hex_kwargs.get("line_wdith"),
-        hex_kwargs.get("radius"),
-    )
-    text_color, numeric_labels, numeric_labels_custom = (
-        text_kwargs.get("text_color"),
-        text_kwargs.get("numeric_labels"),
-        text_kwargs.get("numeric_labels_custom"),
-    )
-    i = 0
-    logger.info("here")
-    for x, y, p, l in zip(hcoord, vcoord, pct, labels):
-        _create_choropleth_hex(
-            ax,
-            [x, y],
-            radius=radius,
-            pct=p,
-            line_color=line_color,
-            line_width=line_width,
-            colormap=colormap,
-        )
-
-        l_new = _handle_numeric_labels(l, p, i, numeric_labels, numeric_labels_custom)
-
-        ax.text(
-            x,
-            y,
-            l_new,
-            ha="center",
-            va="center",
-            size=size,
-            fontweight="bold",
-            family="monospace",
-            color=text_color,
-        )
-        i += 1
-
-    plt.axis("off")
-    if out_path:
-        plt.savefig(out_path, bbox_inches="tight", dpi=300)
-    if show_figure:
-        plt.show()
-
-
-def plot_categorical_hex(
-    hcoord,
-    vcoord,
-    labels,
-    pct,
-    excluded_color="grey",
-    fill_color=["#ef476f", "#ffd166", "#06d6a0", "#118ab2", "black"],
-    excluded_states=None,
-    categorical_order=None,
-    out_path=None,
-    show_figure=True,
-    hex_kwargs=default_hex_args,
-    text_kwargs=default_text_args,
-    **kwargs,
-):
-    """
-    Plotting function that takes in a set of x coordinates, y coordinates, labels, and values
-    to generate a hex map with some level of fill.
-
-    :param hcoord: Horizontal Coordinate of the hexagon
-    :type hcoord: numeric
-    :param vcoord: Vertical Coordinate of the hexagon
-    :type vcoord: numeric
-    :param labels: [Labels to go inside the hexagon]
-    :type labels: str
-    :param pct: value (0-1) that a hexgon will be filled on
-    :type pct: float
-    :param radius: Radius of hexagon, defaults to 1
-    :type radius: int, optional
-    :param size: Size of labels, defaults to 10
-    :type size: int, optional
-    :param fill_color: [description], defaults to "#1d3557"
-    :type fill_color: str, optional
-    :param top_color: [description], defaults to "#e63946"
-    :type top_color: str, optional
-    :param line_color: [description], defaults to "#ffffff"
-    :type line_color: str, optional
-    :param text_color: [description], defaults to "#ffffff"
-    :type text_color: str, optional
-    :param figsize: [description], defaults to (8, 5)
-    :type figsize: tuple, optional
-    :param out_path: [description], defaults to None
-    :type out_path: [type], optional
-    """
-    fig, ax = plt.subplots(**kwargs)
-
-    size, line_color, line_width, radius = (
-        hex_kwargs.get("text_color"),
-        hex_kwargs.get("line_color"),
-        hex_kwargs.get("line_wdith"),
-        hex_kwargs.get("radius"),
-    )
-    text_color, numeric_labels, numeric_labels_custom = (
-        text_kwargs.get("text_color"),
-        text_kwargs.get("numeric_labels"),
-        text_kwargs.get("numeric_labels_custom"),
-    )
-    i = 0
     pct = _handle_categories(
-        pct, fill_color=fill_color, categorical_order=categorical_order
+        pct,
+        fill_color=fill_color,
+        chart_type=chart_type,
+        categorical_order=categorical_order,
     )
 
     for x, y, p, l in zip(hcoord, vcoord, pct, labels):
@@ -662,20 +495,43 @@ def plot_categorical_hex(
             temp_color = fill_color
             temp_text_color = text_color
 
-        _create_categorical_hex(
-            ax,
-            [x, y],
-            radius=radius,
-            pct=p,
-            fill_color=temp_color,
-            line_color=line_color,
-            line_width=line_width,
-        )
+        if chart_type == "vbar":
+            _create_vbar_hex(
+                ax,
+                [x, y],
+                radius=radius,
+                pct=p,
+                fill_color=temp_color,
+                line_color=line_color,
+                line_width=line_width,
+            )
+        elif chart_type == "choropleth":
+            _create_choropleth_hex(
+                ax,
+                [x, y],
+                radius=radius,
+                pct=p,
+                line_color=line_color,
+                line_width=line_width,
+                colormap=colormap,
+            )
+
+        else:
+            _create_categorical_hex(
+                ax,
+                [x, y],
+                radius=radius,
+                pct=p,
+                line_color=line_color,
+                line_width=line_width,
+            )
+
+        l_new = _handle_numeric_labels(l, p, i, numeric_labels, numeric_labels_custom)
 
         ax.text(
             x,
             y,
-            l,
+            l_new,
             ha="center",
             va="center",
             size=size,
@@ -756,6 +612,10 @@ def us_plot_hex(
         "line_color": line_color,
         "line_width": line_width,
         "radius": radius,
+        "categorical_order": categorical_order,
+        "excluded_states": excluded_states,
+        "excluded_color": excluded_color,
+        "colormap": colormap,
     }
 
     text_args = {
@@ -764,46 +624,19 @@ def us_plot_hex(
         "numeric_labels_custom": custom_labels,
     }
 
-    if chart_type == "vbar":
-        return plot_vbar_hex(
-            h,
-            v,
-            l,
-            dataset.pct,
-            fill_color=fill_color,
-            out_path=out_path,
-            show_figure=show_figure,
-            excluded_color=excluded_color,
-            excluded_states=excluded_states,
-            hex_kwargs=hex_args,
-            text_kwargs=text_args,
-            **kwargs,
-        )
-    elif chart_type == "choropleth":
-        return plot_choropleth_hex(
-            h,
-            v,
-            l,
-            dataset.pct,
-            colormap=colormap,
-            out_path=out_path,
-            show_figure=show_figure,
-            hex_kwargs=hex_args,
-            text_kwargs=text_args,
-            **kwargs,
-        )
-    elif chart_type == "categorical":
-        return plot_categorical_hex(
-            h,
-            v,
-            l,
-            dataset.pct,
-            out_path=out_path,
-            show_figure=show_figure,
-            excluded_color=excluded_color,
-            excluded_states=excluded_states,
-            categorical_order=categorical_order,
-            hex_kwargs=hex_args,
-            text_kwargs=text_args,
-            **kwargs,
-        )
+    return plot_hex(
+        h,
+        v,
+        l,
+        dataset.pct,
+        chart_type=chart_type,
+        fill_color=fill_color,
+        out_path=out_path,
+        show_figure=show_figure,
+        excluded_color=excluded_color,
+        excluded_states=excluded_states,
+        hex_kwargs=hex_args,
+        text_kwargs=text_args,
+        **kwargs,
+    )
+

@@ -1,6 +1,6 @@
 import numpy as np
 import string
-from shmapy.hex_mapify import plot_vbar_hex
+from shmapy.hex_mapify import plot_hex
 
 # Generate hexagons next to each other
 coord = [
@@ -26,12 +26,13 @@ unique_labels = [
 value = np.random.random(len(hcoord))
 
 # Run supporting plotting function
-plot_vbar_hex(
+plot_hex(
     hcoord,
     vcoord,
     unique_labels,
     value,
-    radius=0.5,
+    chart_type="vbar",
     # numeric_labels=numeric_labels,
     figsize=(5, 5),
+    show_figure=True,
 )
