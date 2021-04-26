@@ -2,7 +2,7 @@ from numpy.core import numeric
 import pytest
 import pandas as pd
 
-from shmapy.hex_mapify import us_plot_hex
+from shmapy.hex_shmap import us_plot_hex
 
 states_to_test = ["CA", "MD", "PA", "TX"]
 
@@ -17,7 +17,7 @@ states_to_test = ["CA", "MD", "PA", "TX"]
         ("tests/data/demo_input5.csv", "categorical"),
     ],
 )
-def test_hex_mapify_default(filename, chart_type):
+def test_hex_shmap_default(filename, chart_type):
     us_plot_hex(filename, chart_type=chart_type, show_figure=False)
     assert 1 == 1
 
