@@ -25,13 +25,14 @@ def facet_plot_us(
     layout_args=None,
     subplot_args=None,
     out_path=None,
+    **fwargs
 ) -> None:
     us_coordinates = get_state_coordinates()
 
     df_coordinates = merge_coordinates(df, us_coordinates, facet_col)
 
     valid_coords = list(map(tuple, us_coordinates[["row", "col"]].values))
-    logger.info(df_coordinates.head())
+    # logger.info(df_coordinates.head())
     # Four axes, returned as a 2-d array
     f, ax = plt.subplots(
         max(us_coordinates.row) + 1, max(us_coordinates.col) + 1, figsize=figsize
@@ -45,7 +46,7 @@ def facet_plot_us(
         derp = ax[row, col]
 
         # derp should take in a plotting function of some kind
-        function(derp, df_temp)
+        function(derp, df_temp, **fwargs)
 
     #     derp.title.set_backgroundcolor('lightgray')
     f.tight_layout(pad=0.05)
