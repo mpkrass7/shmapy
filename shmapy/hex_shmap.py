@@ -78,21 +78,28 @@ def _handle_categories(
     return [color_mapper[i] for i in value_list]
 
 
-def _handle_numeric_labels(l, p, i, numeric_labels=None, custom_label=None):
+def _handle_numeric_labels(
+    l, p, i, numeric_labels=None, custom_label=None, bold_state=True
+):
+
+    state_label = l
+    if bold_state:
+        state_label = r"$\bf{" + state_label + "}$"
+
     if custom_label is not None:
         # numeric labels can be a string called 'all'
         # if it’s all, it adds the percent fill label on the chart for every state
         # if it’s a list, it adds the % label for each state on the list
         # else it just labels the state
         # Applies to vbar and choropleth Unsure about applying to categories right now..
-        l = l + f"\n{custom_label[i]}"
+        l = state_label + f"\n{custom_label[i]}"
 
     elif numeric_labels:
         if type(numeric_labels) == str:
             if numeric_labels.lower() == "all":
-                l = l + f"\n{str(round(p*100))}%"
+                l = state_label + f"\n{str(round(p*100))}%"
         elif len(numeric_labels) >= 1 and l in numeric_labels:
-            l = l + f"\n{str(round(p*100))}%"
+            l = state_label + f"\n{str(round(p*100))}%"
     return l
 
 
@@ -183,9 +190,13 @@ def _create_vbar_hex(
         ytop = [
             coord[1],
             coord[1] + radius / 2,
-            coord[1] + (radius / (2 * height)) * (height - xoffset) + radius / 2,
+            coord[1]
+            + (radius / (2 * height)) * (height - xoffset)
+            + radius / 2,
             coord[1] + radius,
-            coord[1] + (radius / (2 * height)) * (height - xoffset) + radius / 2,
+            coord[1]
+            + (radius / (2 * height)) * (height - xoffset)
+            + radius / 2,
             coord[1] + radius / 2,
             coord[1],
         ]
@@ -193,9 +204,11 @@ def _create_vbar_hex(
         ybottom = [
             coord[1],
             coord[1] - radius / 2,
-            coord[1] - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
+            coord[1]
+            - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
             coord[1] - radius,
-            coord[1] - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
+            coord[1]
+            - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
             coord[1] - radius / 2,
             coord[1],
         ]
@@ -305,9 +318,13 @@ def _create_vbar_hex(
             ytop = [
                 coord[1],
                 coord[1] + radius / 2,
-                coord[1] + (radius / (2 * height)) * (height - xoffset) + radius / 2,
+                coord[1]
+                + (radius / (2 * height)) * (height - xoffset)
+                + radius / 2,
                 coord[1] + radius,
-                coord[1] + (radius / (2 * height)) * (height - xoffset) + radius / 2,
+                coord[1]
+                + (radius / (2 * height)) * (height - xoffset)
+                + radius / 2,
                 coord[1] + radius / 2,
                 coord[1],
             ]
@@ -315,9 +332,11 @@ def _create_vbar_hex(
             ybottom = [
                 coord[1],
                 coord[1] - radius / 2,
-                coord[1] - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
+                coord[1]
+                - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
                 coord[1] - radius,
-                coord[1] - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
+                coord[1]
+                - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
                 coord[1] - radius / 2,
                 coord[1],
             ]
@@ -372,7 +391,13 @@ def _create_vbar_hex(
 
 
 def _create_choropleth_hex(
-    ax, coord, radius, pct, line_color="#ffffff", line_width=1, colormap="viridis",
+    ax,
+    coord,
+    radius,
+    pct,
+    line_color="#ffffff",
+    line_width=1,
+    colormap="viridis",
 ):
 
     height = np.sqrt(3) / 2 * radius
@@ -389,7 +414,12 @@ def _create_choropleth_hex(
 
 
 def _create_categorical_hex(
-    ax, coord, radius, pct, line_color="#ffffff", line_width=1,
+    ax,
+    coord,
+    radius,
+    pct,
+    line_color="#ffffff",
+    line_width=1,
 ):
 
     height = np.sqrt(3) / 2 * radius
@@ -526,7 +556,9 @@ def plot_hex(
                 line_width=line_width,
             )
 
-        l_new = _handle_numeric_labels(l, p, i, numeric_labels, numeric_labels_custom)
+        l_new = _handle_numeric_labels(
+            l, p, i, numeric_labels, numeric_labels_custom
+        )
 
         ax.text(
             x,
@@ -535,7 +567,6 @@ def plot_hex(
             ha="center",
             va="center",
             size=size,
-            fontweight="bold",
             family="monospace",
             color=temp_text_color,
         )
@@ -599,7 +630,9 @@ def us_plot_hex(
         columns={input_df.columns[0]: "state", input_df.columns[1]: "pct"}
     )
 
-    dataset = coordinate_df.merge(input_df, left_on="Abbreviation", right_on="state")
+    dataset = coordinate_df.merge(
+        input_df, left_on="Abbreviation", right_on="state"
+    )
     l, h, v = _extract_coordinates(dataset)
 
     if numeric_labels_custom:
@@ -639,4 +672,3 @@ def us_plot_hex(
         text_kwargs=text_args,
         **kwargs,
     )
-
