@@ -389,11 +389,7 @@ def _create_choropleth_hex(
     artist = ax.fill_between(x, ytop, ybottom, facecolor=cmap(pct))
     ax.plot(x, ytop, color=line_color, linewidth=line_width)
     ax.plot(x, ybottom, color=line_color, linewidth=line_width)
-    divider = make_axes_locatable(ax)
-    cax = divider.append_axes('right', size='5%', pad=0.05)
-    cax.set_xlabel(choropleth_axis_label)
-    fig.colorbar(artist, cax=cax)
-    return ax
+    return ax, artist
 
 
 def _create_categorical_hex(
@@ -524,7 +520,7 @@ def plot_hex(
                 line_width=line_width,
             )
         elif chart_type == "choropleth":
-            _create_choropleth_hex(
+            ax, artist = _create_choropleth_hex(
                 fig,
                 ax,
                 [x, y],
@@ -535,7 +531,6 @@ def plot_hex(
                 colormap=colormap,
                 choropleth_axis_label=choropleth_axis_label,
             )
-            ax.axis('off')
 
         else:
             _create_categorical_hex(
@@ -563,6 +558,12 @@ def plot_hex(
         i += 1
 
     plt.axis("off")
+    if chart_type == "choropleth":
+        cax = fig.add_axes([0.85, 0.2, 0.03, 0.25], label=choropleth_axis_label)
+        cax.set_xlabel(choropleth_axis_label)
+        fig.colorbar(artist, cax=cax, ax=ax)
+        ax.axis('off')
+
     if category_labels:
         # custom legend
         patches = []
