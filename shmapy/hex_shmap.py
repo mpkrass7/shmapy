@@ -5,6 +5,8 @@ import numpy as np
 import copy
 from logzero import logger
 import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+import matplotlib.patches as mpatches
 from shmapy.input import (
     _read_user_input,
     _read_coordinate_file,
@@ -60,39 +62,48 @@ def _set_y(coord, radius):
 
 
 def _handle_categories(
-    value_list, fill_color, chart_type, categorical_order=None
+    value_list, fill_color, chart_type, category_labels=None
 ) -> list:
     if chart_type != "categorical":
-        return value_list
+        return value_list, category_labels
 
-    if categorical_order:
-        assert len(fill_color) >= len(categorical_order)
-        fill_color = fill_color[: len(categorical_order)]
-        color_mapper = dict(zip(categorical_order, fill_color))
-
+    if category_labels:
+        assert len(fill_color) >= len(category_labels)
+        fill_color = fill_color[: len(category_labels)]
+        value_to_override_category = {val: c for val, c in zip(value_list.unique(), category_labels)}
+        value_list = value_list.apply(lambda row: value_to_override_category[row])
+        color_mapper = dict(zip(category_labels, fill_color))
+        return [color_mapper[i] for i in value_list], set(color_mapper.keys())
     else:
         # If no order is supplied we'll just do things in order
         assert len(fill_color) >= len(set(value_list))
         fill_color = fill_color[: len(set(value_list))]
         color_mapper = dict(zip(set(value_list), fill_color))
-    return [color_mapper[i] for i in value_list]
+        return [color_mapper[i] for i in value_list], set(color_mapper.keys())
 
 
-def _handle_numeric_labels(l, p, i, numeric_labels=None, custom_label=None):
+def _handle_numeric_labels(
+    l, p, i, numeric_labels=None, custom_label=None, bold_state=True
+):
+
+    state_label = l
+    if bold_state:
+        state_label = r"$\bf{" + state_label + "}$"
+
     if custom_label is not None:
         # numeric labels can be a string called 'all'
         # if it’s all, it adds the percent fill label on the chart for every state
         # if it’s a list, it adds the % label for each state on the list
         # else it just labels the state
         # Applies to vbar and choropleth Unsure about applying to categories right now..
-        l = l + f"\n{custom_label[i]}"
+        l = state_label + f"\n{custom_label[i]}"
 
     elif numeric_labels:
         if type(numeric_labels) == str:
             if numeric_labels.lower() == "all":
-                l = l + f"\n{str(round(p*100))}%"
+                l = state_label + f"\n{str(round(p*100))}%"
         elif len(numeric_labels) >= 1 and l in numeric_labels:
-            l = l + f"\n{str(round(p*100))}%"
+            l = state_label + f"\n{str(round(p*100))}%"
     return l
 
 
@@ -183,9 +194,13 @@ def _create_vbar_hex(
         ytop = [
             coord[1],
             coord[1] + radius / 2,
-            coord[1] + (radius / (2 * height)) * (height - xoffset) + radius / 2,
+            coord[1]
+            + (radius / (2 * height)) * (height - xoffset)
+            + radius / 2,
             coord[1] + radius,
-            coord[1] + (radius / (2 * height)) * (height - xoffset) + radius / 2,
+            coord[1]
+            + (radius / (2 * height)) * (height - xoffset)
+            + radius / 2,
             coord[1] + radius / 2,
             coord[1],
         ]
@@ -193,9 +208,11 @@ def _create_vbar_hex(
         ybottom = [
             coord[1],
             coord[1] - radius / 2,
-            coord[1] - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
+            coord[1]
+            - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
             coord[1] - radius,
-            coord[1] - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
+            coord[1]
+            - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
             coord[1] - radius / 2,
             coord[1],
         ]
@@ -305,9 +322,13 @@ def _create_vbar_hex(
             ytop = [
                 coord[1],
                 coord[1] + radius / 2,
-                coord[1] + (radius / (2 * height)) * (height - xoffset) + radius / 2,
+                coord[1]
+                + (radius / (2 * height)) * (height - xoffset)
+                + radius / 2,
                 coord[1] + radius,
-                coord[1] + (radius / (2 * height)) * (height - xoffset) + radius / 2,
+                coord[1]
+                + (radius / (2 * height)) * (height - xoffset)
+                + radius / 2,
                 coord[1] + radius / 2,
                 coord[1],
             ]
@@ -315,9 +336,11 @@ def _create_vbar_hex(
             ybottom = [
                 coord[1],
                 coord[1] - radius / 2,
-                coord[1] - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
+                coord[1]
+                - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
                 coord[1] - radius,
-                coord[1] - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
+                coord[1]
+                - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
                 coord[1] - radius / 2,
                 coord[1],
             ]
@@ -372,7 +395,7 @@ def _create_vbar_hex(
 
 
 def _create_choropleth_hex(
-    ax, coord, radius, pct, line_color="#ffffff", line_width=1, colormap="viridis",
+    fig, ax, coord, radius, pct, line_color="#ffffff", line_width=1, colormap="viridis", choropleth_axis_label=None,
 ):
 
     height = np.sqrt(3) / 2 * radius
@@ -382,14 +405,19 @@ def _create_choropleth_hex(
 
     cmap = plt.get_cmap(colormap)
     # see for reference https://matplotlib.org/stable/gallery/lines_bars_and_markers/fill_between_demo.html
-    ax.fill_between(x, ytop, ybottom, facecolor=cmap(pct))
+    artist = ax.fill_between(x, ytop, ybottom, facecolor=cmap(pct))
     ax.plot(x, ytop, color=line_color, linewidth=line_width)
     ax.plot(x, ybottom, color=line_color, linewidth=line_width)
-    return ax
+    return ax, artist
 
 
 def _create_categorical_hex(
-    ax, coord, radius, pct, line_color="#ffffff", line_width=1,
+    ax,
+    coord,
+    radius,
+    pct,
+    line_color="#ffffff",
+    line_width=1,
 ):
 
     height = np.sqrt(3) / 2 * radius
@@ -417,6 +445,8 @@ def plot_hex(
     show_figure=True,
     hex_kwargs=default_hex_args,
     text_kwargs=default_text_args,
+    choropleth_axis_label=None,
+    category_labels=None,
     **kwargs,
 ):
     """
@@ -447,6 +477,10 @@ def plot_hex(
     :type figsize: tuple, optional
     :param out_path: [description], defaults to None
     :type out_path: [type], optional
+    :param choropleth_axis_label: Label for the choropleth colorbar.
+    :type choropleth_axis_label: str
+    :param category_labels: List of strings that describe the categories of the graph. Used in the legend. Defaults to None.
+    :type category_labels: list of strings 
     """
     assert chart_type in ["vbar", "choropleth", "categorical"]
 
@@ -456,7 +490,7 @@ def plot_hex(
         line_color,
         line_width,
         radius,
-        categorical_order,
+        category_labels,
         excluded_states,
         excluded_color,
         colormap,
@@ -464,7 +498,7 @@ def plot_hex(
         hex_kwargs.get("line_color"),
         hex_kwargs.get("line_wdith"),
         hex_kwargs.get("radius"),
-        hex_kwargs.get("categorical_order"),
+        hex_kwargs.get("category_labels"),
         hex_kwargs.get("excluded_states"),
         hex_kwargs.get("excluded_color"),
         hex_kwargs.get("colormap"),
@@ -477,12 +511,16 @@ def plot_hex(
         text_kwargs.get("numeric_labels_custom"),
     )
 
-    pct = _handle_categories(
+    pct, derived_categories = _handle_categories(
         pct,
         fill_color=fill_color,
         chart_type=chart_type,
-        categorical_order=categorical_order,
+        category_labels=category_labels,
     )
+    # if category_labels is not set, instantiate an empty set in case
+    # the user has categories defined in the input file
+    if chart_type == "categorical":
+        category_labels = derived_categories
 
     for x, y, p, l in zip(hcoord, vcoord, pct, labels):
 
@@ -505,7 +543,8 @@ def plot_hex(
                 line_width=line_width,
             )
         elif chart_type == "choropleth":
-            _create_choropleth_hex(
+            ax, artist = _create_choropleth_hex(
+                fig,
                 ax,
                 [x, y],
                 radius=radius,
@@ -513,6 +552,7 @@ def plot_hex(
                 line_color=line_color,
                 line_width=line_width,
                 colormap=colormap,
+                choropleth_axis_label=choropleth_axis_label,
             )
 
         else:
@@ -525,7 +565,9 @@ def plot_hex(
                 line_width=line_width,
             )
 
-        l_new = _handle_numeric_labels(l, p, i, numeric_labels, numeric_labels_custom)
+        l_new = _handle_numeric_labels(
+            l, p, i, numeric_labels, numeric_labels_custom
+        )
 
         ax.text(
             x,
@@ -534,13 +576,24 @@ def plot_hex(
             ha="center",
             va="center",
             size=size,
-            fontweight="bold",
             family="monospace",
             color=temp_text_color,
         )
         i += 1
     fig.tight_layout()
     plt.axis("off")
+    if chart_type == "choropleth":
+        cax = fig.add_axes([0.85, 0.2, 0.03, 0.25], label=choropleth_axis_label)
+        cax.set_xlabel(choropleth_axis_label)
+        fig.colorbar(artist, cax=cax, ax=ax)
+        ax.axis('off')
+
+    if category_labels:
+        # custom legend
+        patches = []
+        for color, label in zip(fill_color, category_labels):
+            patches.append(mpatches.Patch(color=color, label=label))
+        ax.legend(handles=patches, frameon=False)
     if out_path:
         plt.savefig(out_path, bbox_inches="tight", dpi=300)
     if show_figure:
@@ -561,9 +614,10 @@ def us_plot_hex(
     numeric_labels=None,
     numeric_labels_custom=None,
     excluded_states=None,
-    categorical_order=None,
     show_figure=True,
     out_path=None,
+    choropleth_axis_label=None,
+    category_labels=None,
     **kwargs,
 ):
     """
@@ -589,6 +643,10 @@ def us_plot_hex(
     :type text_color: str, optional
     :param figsize: [description], defaults to (8, 5)
     :type figsize: tuple, optional
+    :param choropleth_axis_label: Label for the choropleth colorbar.
+    :type choropleth_axis_label: str
+    :param category_labels: List of strings that describe the categories of the graph. Used in the legend. Defaults to None.
+    :type category_labels: list of strings 
     :return: [description]
     :rtype: [type]
     """
@@ -598,7 +656,9 @@ def us_plot_hex(
         columns={input_df.columns[0]: "state", input_df.columns[1]: "pct"}
     )
 
-    dataset = coordinate_df.merge(input_df, left_on="Abbreviation", right_on="state")
+    dataset = coordinate_df.merge(
+        input_df, left_on="Abbreviation", right_on="state"
+    )
     l, h, v = _extract_coordinates(dataset)
 
     if numeric_labels_custom:
@@ -610,7 +670,7 @@ def us_plot_hex(
         "line_color": line_color,
         "line_width": line_width,
         "radius": radius,
-        "categorical_order": categorical_order,
+        "category_labels": category_labels,
         "excluded_states": excluded_states,
         "excluded_color": excluded_color,
         "colormap": colormap,
@@ -636,6 +696,7 @@ def us_plot_hex(
         excluded_states=excluded_states,
         hex_kwargs=hex_args,
         text_kwargs=text_args,
+        choropleth_axis_label=choropleth_axis_label,
+        category_labels=category_labels,
         **kwargs,
     )
-
