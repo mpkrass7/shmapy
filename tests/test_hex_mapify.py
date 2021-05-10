@@ -59,7 +59,7 @@ def test_hex_choropleth_custom(filename, numeric_labels, numeric_labels_custom):
 
 
 @pytest.mark.parametrize(
-    "filename,categorical_order",
+    "filename,category_labels",
     [
         ("tests/data/demo_input5.csv", None),
         (
@@ -68,11 +68,11 @@ def test_hex_choropleth_custom(filename, numeric_labels, numeric_labels_custom):
         ),
     ],
 )
-def test_hex_categorical_custom(filename, categorical_order):
+def test_hex_categorical_custom(filename, category_labels):
     us_plot_hex(
         filename,
         chart_type="categorical",
-        categorical_order=categorical_order,
+        category_labels=category_labels,
         show_figure=False,
     )
     assert 1 == 1
