@@ -65,7 +65,7 @@ def _handle_categories(
     value_list, fill_color, chart_type, category_labels=None
 ) -> list:
     if chart_type != "categorical":
-        return value_list
+        return value_list, category_labels
 
     if category_labels:
         assert len(fill_color) >= len(category_labels)
