@@ -427,7 +427,7 @@ def plot_hex(
     :type hcoord: numeric
     :param vcoord: Vertical Coordinate of the hexagon
     :type vcoord: numeric
-    :param labels: [Labels to go inside the hexagon]
+    :param labels: [Labels to go inside the hexsagon]
     :type labels: str
     :param pct: value (0-1) that a hexgon will be filled on
     :type pct: float
@@ -453,7 +453,6 @@ def plot_hex(
     fig, ax = plt.subplots(**kwargs)
     i = 0
     (
-        size,
         line_color,
         line_width,
         radius,
@@ -462,7 +461,6 @@ def plot_hex(
         excluded_color,
         colormap,
     ) = (
-        hex_kwargs.get("text_color"),
         hex_kwargs.get("line_color"),
         hex_kwargs.get("line_wdith"),
         hex_kwargs.get("radius"),
@@ -472,7 +470,8 @@ def plot_hex(
         hex_kwargs.get("colormap"),
     )
 
-    text_color, numeric_labels, numeric_labels_custom = (
+    size, text_color, numeric_labels, numeric_labels_custom = (
+        text_kwargs.get("size"),
         text_kwargs.get("text_color"),
         text_kwargs.get("numeric_labels"),
         text_kwargs.get("numeric_labels_custom"),
@@ -540,7 +539,7 @@ def plot_hex(
             color=temp_text_color,
         )
         i += 1
-
+    fig.tight_layout()
     plt.axis("off")
     if out_path:
         plt.savefig(out_path, bbox_inches="tight", dpi=300)
@@ -608,7 +607,6 @@ def us_plot_hex(
         custom_labels = None
 
     hex_args = {
-        "size": size,
         "line_color": line_color,
         "line_width": line_width,
         "radius": radius,
@@ -619,6 +617,7 @@ def us_plot_hex(
     }
 
     text_args = {
+        "size": size,
         "text_color": text_color,
         "numeric_labels": numeric_labels,
         "numeric_labels_custom": custom_labels,

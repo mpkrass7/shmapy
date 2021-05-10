@@ -24,6 +24,7 @@ def facet_plot_us(
     figsize=(16, 12),
     layout_args=None,
     subplot_args=None,
+    legend=False,
     out_path=None,
     **fwargs
 ) -> None:

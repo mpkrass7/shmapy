@@ -36,12 +36,6 @@ Add percent fill labels to the plot automatically
 
 ![](./shmapy/img/hex_out_demo1_label.png)
 
-Resize plot (**kwargs get passed to matplotlib.pyplot.subplots())
-
-`shmapy plot-hex static/demo_input1.csv -size=3 -figsize="(3,2)"`
-
-![](./shmapy/img/hex_out_demo1_resize.png)
-
 Plot more than two colors
 
 `shmapy plot-hex static/demo_input3.csv`
