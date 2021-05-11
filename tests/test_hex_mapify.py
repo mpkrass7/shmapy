@@ -36,6 +36,7 @@ def test_hex_vbar_custom(filename, numeric_labels, numeric_labels_custom):
         chart_type="vbar",
         numeric_labels=numeric_labels,
         numeric_labels_custom=numeric_labels_custom,
+        show_figure=False,
     )
     assert 1 == 1
 
@@ -54,6 +55,7 @@ def test_hex_choropleth_custom(filename, numeric_labels, numeric_labels_custom):
         chart_type="choropleth",
         numeric_labels=numeric_labels,
         numeric_labels_custom=numeric_labels_custom,
+        show_figure=False,
     )
     assert 1 == 1
 
