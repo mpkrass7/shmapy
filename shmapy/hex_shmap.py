@@ -70,7 +70,9 @@ def _handle_categories(
     if category_labels:
         assert len(fill_color) >= len(category_labels)
         fill_color = fill_color[: len(category_labels)]
-        value_to_override_category = {val: c for val, c in zip(value_list.unique(), category_labels)}
+        value_to_override_category = {
+            val: c for val, c in zip(value_list.unique(), category_labels)
+        }
         value_list = value_list.apply(lambda row: value_to_override_category[row])
         color_mapper = dict(zip(category_labels, fill_color))
         return [color_mapper[i] for i in value_list], set(color_mapper.keys())
@@ -194,13 +196,9 @@ def _create_vbar_hex(
         ytop = [
             coord[1],
             coord[1] + radius / 2,
-            coord[1]
-            + (radius / (2 * height)) * (height - xoffset)
-            + radius / 2,
+            coord[1] + (radius / (2 * height)) * (height - xoffset) + radius / 2,
             coord[1] + radius,
-            coord[1]
-            + (radius / (2 * height)) * (height - xoffset)
-            + radius / 2,
+            coord[1] + (radius / (2 * height)) * (height - xoffset) + radius / 2,
             coord[1] + radius / 2,
             coord[1],
         ]
@@ -208,11 +206,9 @@ def _create_vbar_hex(
         ybottom = [
             coord[1],
             coord[1] - radius / 2,
-            coord[1]
-            - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
+            coord[1] - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
             coord[1] - radius,
-            coord[1]
-            - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
+            coord[1] - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
             coord[1] - radius / 2,
             coord[1],
         ]
@@ -322,13 +318,9 @@ def _create_vbar_hex(
             ytop = [
                 coord[1],
                 coord[1] + radius / 2,
-                coord[1]
-                + (radius / (2 * height)) * (height - xoffset)
-                + radius / 2,
+                coord[1] + (radius / (2 * height)) * (height - xoffset) + radius / 2,
                 coord[1] + radius,
-                coord[1]
-                + (radius / (2 * height)) * (height - xoffset)
-                + radius / 2,
+                coord[1] + (radius / (2 * height)) * (height - xoffset) + radius / 2,
                 coord[1] + radius / 2,
                 coord[1],
             ]
@@ -336,11 +328,9 @@ def _create_vbar_hex(
             ybottom = [
                 coord[1],
                 coord[1] - radius / 2,
-                coord[1]
-                - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
+                coord[1] - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
                 coord[1] - radius,
-                coord[1]
-                - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
+                coord[1] - ((radius / (2 * height)) * (height - xoffset) + radius / 2),
                 coord[1] - radius / 2,
                 coord[1],
             ]
@@ -395,7 +385,15 @@ def _create_vbar_hex(
 
 
 def _create_choropleth_hex(
-    fig, ax, coord, radius, pct, line_color="#ffffff", line_width=1, colormap="viridis", choropleth_axis_label=None,
+    fig,
+    ax,
+    coord,
+    radius,
+    pct,
+    line_color="#ffffff",
+    line_width=1,
+    colormap="viridis",
+    choropleth_axis_label=None,
 ):
 
     height = np.sqrt(3) / 2 * radius
@@ -412,12 +410,7 @@ def _create_choropleth_hex(
 
 
 def _create_categorical_hex(
-    ax,
-    coord,
-    radius,
-    pct,
-    line_color="#ffffff",
-    line_width=1,
+    ax, coord, radius, pct, line_color="#ffffff", line_width=1,
 ):
 
     height = np.sqrt(3) / 2 * radius
@@ -487,7 +480,6 @@ def plot_hex(
     fig, ax = plt.subplots(**kwargs)
     i = 0
     (
-        size,
         line_color,
         line_width,
         radius,
@@ -496,9 +488,8 @@ def plot_hex(
         excluded_color,
         colormap,
     ) = (
-        hex_kwargs.get("text_color"),
         hex_kwargs.get("line_color"),
-        hex_kwargs.get("line_wdith"),
+        hex_kwargs.get("line_width"),
         hex_kwargs.get("radius"),
         hex_kwargs.get("category_labels"),
         hex_kwargs.get("excluded_states"),
@@ -506,7 +497,8 @@ def plot_hex(
         hex_kwargs.get("colormap"),
     )
 
-    text_color, numeric_labels, numeric_labels_custom = (
+    size, text_color, numeric_labels, numeric_labels_custom = (
+        text_kwargs.get("size"),
         text_kwargs.get("text_color"),
         text_kwargs.get("numeric_labels"),
         text_kwargs.get("numeric_labels_custom"),
@@ -566,9 +558,7 @@ def plot_hex(
                 line_width=line_width,
             )
 
-        l_new = _handle_numeric_labels(
-            l, p, i, numeric_labels, numeric_labels_custom
-        )
+        l_new = _handle_numeric_labels(l, p, i, numeric_labels, numeric_labels_custom)
 
         ax.text(
             x,
@@ -587,7 +577,7 @@ def plot_hex(
         cax = fig.add_axes([0.85, 0.2, 0.03, 0.25], label=choropleth_axis_label)
         cax.set_xlabel(choropleth_axis_label)
         fig.colorbar(artist, cax=cax, ax=ax)
-        ax.axis('off')
+        ax.axis("off")
 
     if category_labels:
         # custom legend
@@ -657,9 +647,7 @@ def us_plot_hex(
         columns={input_df.columns[0]: "state", input_df.columns[1]: "pct"}
     )
 
-    dataset = coordinate_df.merge(
-        input_df, left_on="Abbreviation", right_on="state"
-    )
+    dataset = coordinate_df.merge(input_df, left_on="Abbreviation", right_on="state")
     l, h, v = _extract_coordinates(dataset)
 
     if numeric_labels_custom:
@@ -668,7 +656,6 @@ def us_plot_hex(
         custom_labels = None
 
     hex_args = {
-        "size": size,
         "line_color": line_color,
         "line_width": line_width,
         "radius": radius,
@@ -679,6 +666,7 @@ def us_plot_hex(
     }
 
     text_args = {
+        "size": size,
         "text_color": text_color,
         "numeric_labels": numeric_labels,
         "numeric_labels_custom": custom_labels,

@@ -10,6 +10,9 @@ Install from source:
 `git clone git@github.com:mpkrass7/shmapy.git`  
 `python setup.py install` 
 
+## It's easy to Shmap
+![](./shmapy/img/shmapy_easy_choropleth.gif)
+
 ## Usage
 
 ```bash
