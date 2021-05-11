@@ -1,5 +1,5 @@
 # Shmapy
-The fabulous package for building a United States hex map with optional hex filling.
+The fabulous package for build hex maps and facet maps
 
 ## Install
 
