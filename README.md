@@ -2,7 +2,7 @@
 # Shmapy
 [![codecov](https://codecov.io/gh/mpkrass7/shmapy/branch/main/graph/badge.svg?token=CEZPWV1NIR)](https://codecov.io/gh/mpkrass7/shmapy)
 
-The fabulous package for build hex maps and facet maps
+The fabulous package for building hex maps and facet maps
 
 ## Install
 
