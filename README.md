@@ -6,14 +6,17 @@ The fabulous package for build hex maps and facet maps
 
 ## Install
 
-Install from source:  
+Install from pip:
+`pip install shmapy`
+
+Or Install from source:  
 `git clone git@github.com:mpkrass7/shmapy.git`  
 `python setup.py install` 
 
 ## It's easy to Shmap
 ![](./shmapy/img/shmapy_easy_choropleth.gif)
 
-## Usage
+## Easy on the Command Line
 
 ```bash
 head -10 shmapy/static/demo_input1.csv
@@ -30,29 +33,11 @@ DE,0.241586764
 FL,0.040757232
 ```
 
-Play with colors
 
-`shmapy plot-hex --fill_color="['blue','green']" --category_labels=Positive,Negative shmapy/static/demo_input1.csv`
-
-![](./shmapy/img/hex_out_demo1.png)
-
-Add percent fill labels to the plot automatically
-
-`shmapy plot-hex --numeric_labels=all --size=8 shmapy/static/demo_input1.csv`
+`shmapy plot-hex --chart_type="vbar" --numeric_labels=all --size=8 --line_color='black' shmapy/static/demo_input1.csv`
 
 ![](./shmapy/img/hex_out_demo1_label.png)
 
-Resize plot (**kwargs get passed to matplotlib.pyplot.subplots())
-
-`shmapy plot-hex --size=3 --figsize="(3,2)" shmapy/static/demo_input1.csv`
-
-![](./shmapy/img/hex_out_demo1_resize.png)
-
-Plot more than two colors
-
-`shmapy plot-hex shmapy/static/demo_input3.csv`
-
-![](./shmapy/img/hex_out_demo3.png)
 
 Plot a choropleth
 
@@ -62,15 +47,10 @@ Plot a choropleth
 ![](./shmapy/img/hex_out_demo1_choropleth.png)
 
 Plot a category using categories defined in the input file
+
 `shmapy plot-hex --chart_type="categorical" shmapy/static/demo_input5.csv`
 
 ![](./shmapy/img/hex_out_demo5.png)
-
-Plot a category but override the category names to user-defined category labels
-`shmapy plot-hex --chart_type="categorical" --category_labels=a,b,c,d,e shmapy/static/demo_input5.csv`
-
-![](./shmapy/img/hex_out_demo5_override.png)
-
 
 ## Input Dataframe
 
@@ -85,7 +65,7 @@ the 'numeric_labels_custom' argument.
 
 ## Options
 
-chart_type: 'vbar' or 'choropleth'. Default is vbar.
+chart_type: 'vbar', 'choropleth' or 'categorical'. Default is vbar.
   vbar: vertical bar. Each hexagon will consist of a vertical bar chart. If the
 user submits a single float or length-1 list in each row of the values column
 of the input dataframe, the values are scaled such that  min(value)=0 and 
@@ -118,7 +98,7 @@ custom numeric labels for the states. Default None. A numeric custom label repla
 the standard numeric label and is positioned under the state name.
 
 
-**Special Credits to Kevin Arvai for building the real infrastructure on this package and Gregory Michaelson for figuring out everything hexagon**
+**Special Credits to Kevin Arvai for building the real infrastructure on this package and Gregory Michaelson for figuring out how to partially fill a hexagon**
 
 ## To Do Items:
 - Users can supply a categorical fill
