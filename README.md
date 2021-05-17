@@ -14,7 +14,10 @@ Or Install from source:
 `python setup.py install` 
 
 ## It's easy to Shmap
+
 ![](./shmapy/img/shmapy_easy_choropleth.gif)
+
+Checkout the `shmapy/examples/shmapy_basics.ipynb` notebook
 
 ## Easy on the Command Line
 
@@ -34,19 +37,21 @@ FL,0.040757232
 ```
 
 
-`shmapy plot-hex --chart_type="vbar" --numeric_labels=all --size=8 --line_color='black' shmapy/static/demo_input1.csv`
-
-![](./shmapy/img/hex_out_demo1_label.png)
-
-
-Plot a choropleth
+### Plot a choropleth
 
 `shmapy plot-hex --chart_type="choropleth" --choropleth_axis_label="Positivity" shmapy/static/demo_input1.csv`
 
 
 ![](./shmapy/img/hex_out_demo1_choropleth.png)
 
-Plot a category using categories defined in the input file
+### Plot a percent fill
+
+`shmapy plot-hex --chart_type="vbar" --numeric_labels=all --size=8 --line_color='black' shmapy/static/demo_input1.csv`
+
+![](./shmapy/img/hex_out_demo1_label.png)
+
+
+### Plot a category using categories defined in the input file
 
 `shmapy plot-hex --chart_type="categorical" shmapy/static/demo_input5.csv`
 
