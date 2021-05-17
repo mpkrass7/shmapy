@@ -10,6 +10,82 @@ from pandas.errors import ParserError
 project_directory = Path(__file__).parent
 
 
+def _read_coordinate_file():
+    # Reads built in state coordinates file
+    return pd.read_csv(project_directory.joinpath("static", "state_coordinates.csv"))
+
+
+def _extract_coordinates(coords):
+    """
+    Extract Coordinates from base file
+    """
+
+    coord = coords[["X", "Y"]].values
+    labels = coords.Abbreviation
+    hcoord = [c[0] for c in coord]
+    vcoord = [c[1] for c in coord]
+    return labels, hcoord, vcoord
+
+
+def read_user_coordinates(df):
+    # Read in of X, Y, label coordinates for hexagons
+    df.columns = ["X", "Y", "Abbreviation"]
+
+    l, h, v = _extract_coordinates(df)
+
+    return l, h, v
+
+
+def state_to_abbreviation(values):
+    """Always convert to state abbreviations"""
+    coords = _read_coordinate_file()
+    state_to_abbrev = dict(zip(coords["State"], coords["Abbreviation"]))
+    values["state"] = values["state"].apply(
+        lambda row: state_to_abbrev[row] if row in state_to_abbrev else row
+    )
+
+    return values
+
+
+def state_validator(values):
+    try:
+        assert len(values) == 50 or len(values) == 51
+        # make sure abbreviations were converted
+        assert all([len(state) == 2 for state in values["state"]])
+    except AssertionError:
+        warnings.warn(
+            """
+        Expected input should only include 50 or 51 states. 
+        Map will have missing hexagons
+         """
+        )
+
+
+def rescale_data(values):
+
+    # if the values aren't lists, we rescale each value to be between 0 and 1 with min and max set by the whole dataset.
+    # if there are list values, that means the user wants a stacked bar chart, and each list is set to sum to 1 in hexmapify.
+    # actually I do not think this should be part of the input validation.
+
+    if sum([type(i) == list for i in values.value]) == 0:
+        values["_original"] = values["value"].copy()
+        try:
+            assert max(values.value) <= 1 and min(values.value) >= 0
+        except AssertionError:
+            warnings.warn(
+                """
+                Expected values are between 0 and 1. 
+                Rescaling values so that max is 1 and min is 0
+                """
+            )
+            # Scale values to be between 0 1
+            values["value"] = np.interp(
+                values.value, (values.value.min(), values.value.max()), (0.0, 1.0)
+            )
+
+    return values
+
+
 def _read_user_input(user_input, chart_type="vbar") -> pd.DataFrame:
     """
     Accepts dataframe, numpy array dictionary or path to a csv or xlsx file
@@ -59,78 +135,3 @@ def _read_user_input(user_input, chart_type="vbar") -> pd.DataFrame:
     else:
         return rescale_data(values)
 
-
-def _read_coordinate_file():
-    # Reads built in state coordinates file
-    return pd.read_csv(project_directory.joinpath("static", "state_coordinates.csv"))
-
-
-def read_user_coordinates(df):
-    # Read in of X, Y, label coordinates for hexagons
-    df.columns = ["X", "Y", "Abbreviation"]
-
-    l, h, v = _extract_coordinates(df)
-
-    return l, h, v
-
-
-def state_validator(values):
-    try:
-        assert len(values) == 50 or len(values) == 51
-        # make sure abbreviations were converted
-        assert all([len(state) == 2 for state in values["state"]])
-    except AssertionError:
-        warnings.warn(
-            """
-        Expected input should only include 50 or 51 states. 
-        Map will have missing hexagons
-         """
-        )
-
-
-def rescale_data(values):
-
-    # if the values aren't lists, we rescale each value to be between 0 and 1 with min and max set by the whole dataset.
-    # if there are list values, that means the user wants a stacked bar chart, and each list is set to sum to 1 in hexmapify.
-    # actually I do not think this should be part of the input validation.
-
-    # TODO: move rescaling somewhere else
-    if sum([type(i) == list for i in values.value]) == 0:
-        try:
-            assert max(values.value) <= 1 and min(values.value) >= 0
-        except AssertionError:
-            warnings.warn(
-                """
-                Expected values are between 0 and 1. 
-                Rescaling values so that max is 1 and min is 0
-                """
-            )
-            # Scale values to be between 0 1
-            values["value"] = np.interp(
-                values.value, (values.value.min(), values.value.max()), (0.0, 1.0)
-            )
-
-    return values
-
-
-def _extract_coordinates(coords):
-    """
-    Extract Coordinates from base file
-    """
-
-    coord = coords[["X", "Y"]].values
-    labels = coords.Abbreviation
-    hcoord = [c[0] for c in coord]
-    vcoord = [c[1] for c in coord]
-    return labels, hcoord, vcoord
-
-
-def state_to_abbreviation(values):
-    """Always convert to state abbreviations"""
-    coords = _read_coordinate_file()
-    state_to_abbrev = dict(zip(coords["State"], coords["Abbreviation"]))
-    values["state"] = values["state"].apply(
-        lambda row: state_to_abbrev[row] if row in state_to_abbrev else row
-    )
-
-    return values

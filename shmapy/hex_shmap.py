@@ -573,7 +573,7 @@ def plot_hex(
         i += 1
 
     plt.axis("off")
-    if chart_type == "choropleth":
+    if chart_type == "choropleth" and choropleth_axis_label:
         cax = fig.add_axes([0.85, 0.2, 0.03, 0.25], label=choropleth_axis_label)
         cax.set_xlabel(choropleth_axis_label)
         fig.colorbar(artist, cax=cax, ax=ax)
@@ -644,7 +644,11 @@ def us_plot_hex(
     coordinate_df = _read_coordinate_file()
     input_df = _read_user_input(input_df, chart_type=chart_type)
     input_df = input_df.rename(
-        columns={input_df.columns[0]: "state", input_df.columns[1]: "pct"}
+        columns={
+            input_df.columns[0]: "state",
+            input_df.columns[1]: "pct",
+            # input_df.columns[2]: "value",
+        }
     )
 
     dataset = coordinate_df.merge(input_df, left_on="Abbreviation", right_on="state")
@@ -689,3 +693,4 @@ def us_plot_hex(
         category_labels=category_labels,
         **kwargs,
     )
+
