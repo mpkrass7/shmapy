@@ -101,12 +101,8 @@ the standard numeric label and is positioned under the state name.
 **Special Credits to Kevin Arvai for building the real infrastructure on this package and Gregory Michaelson for figuring out how to partially fill a hexagon**
 
 ## To Do Items:
-- Users can supply a categorical fill
 - Users can optionally exclude states (filling in an arbitrary color)
-- Users can supply custom cooridnates for the hexagons -- Done
-- Users can fill hexagons on a gradient -- Done
+- Users can supply custom cooridnates for the hexagons
 - Users have **kwargs access to plot output to optionally include axes, title etc.. -- Some Kwargs are here!
-- Users can customize which states are filled
-- Users can supply values underneath state label -- Done
 - Flexibility around state name or abbrev capitalization
 - Flexibility around number of states provided
