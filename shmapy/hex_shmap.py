@@ -34,6 +34,13 @@ default_text_args = {
 default_missing_args = {"missing_text_color": "grey", "missing_text_fill": "white"}
 
 
+def _check_nulls(value):
+    if type(value) == list:
+        return True
+    if np.isnan(value) | value is None | pd.isna(value) | value == "":
+        return False
+
+
 def _set_x(coord, height):
     x = [
         coord - height,
@@ -78,32 +85,66 @@ def _handle_categories(
     category_labels: list = None,
     missing_fill_color: str = "white",
 ) -> list:
+    """
+    Internal function for handling categories.
+    Takes a list of categories, fill_color, and corresponding category labels 
+    and returns a mapping from the value to the category label. If no category labels
+    are supplied, 
+
+    Parameters
+    ----------
+    value_list : list
+        [description]
+    fill_color : list
+        [description]
+    chart_type : str
+        [description]
+    category_labels : list, optional
+        [description], by default None
+    missing_fill_color : str, optional
+        [description], by default "white"
+
+    Returns
+    -------
+    list
+        [description]
+    """
     if chart_type != "categorical":
         return value_list, category_labels
 
     if category_labels:
-        assert len(fill_color) >= len(category_labels)
-        fill_color = fill_color[: len(category_labels)]
-        value_to_override_category = {
-            val: c for val, c in zip(value_list.unique(), category_labels)
-        }
+        assert len(fill_color) == len(category_labels)
+        # fill_color = fill_color[: len(category_labels)]
+        # value_to_override_category = {
+        #     val: c for val, c in zip(value_list.unique(), category_labels)
+        # }
+        # value_list = value_list.apply(lambda row: value_to_override_category[row])
 
-        value_list = value_list.apply(lambda row: value_to_override_category[row])
+        # Create a dictionary to map a category to a fill
         color_mapper = dict(zip(category_labels, fill_color))
-        color_mapper[None] = missing_fill_color
+        # Add an entry for missing values
+        color_mapper[np.nan] = missing_fill_color
         return [color_mapper[i] for i in value_list], set(color_mapper.keys())
+
     else:
         # If no order is supplied we'll just do things in order
         assert len(fill_color) >= len(set(value_list))
         fill_color = fill_color[: len(set(value_list))]
-        color_mapper = dict(zip(set(value_list), fill_color))
+        non_na_value_list = [i for i in value_list if i is not None]
+        color_mapper = dict(zip(set(non_na_value_list), fill_color))
+        color_mapper[np.nan] = missing_fill_color
         return [color_mapper[i] for i in value_list], set(color_mapper.keys())
+
+
+def _compute_state_text_color(p, text_color, missing_text_color):
+    if isinstance(p, list):
+        return text_color
+    return missing_text_color if pd.isna(p) else text_color
 
 
 def _handle_numeric_labels(
     l, p, i, numeric_labels=None, custom_label=None, bold_state=True
 ):
-
     state_label = l
     if bold_state:
         state_label = r"$\bf{" + state_label + "}$"
@@ -114,10 +155,13 @@ def _handle_numeric_labels(
         # if it’s a list, it adds the % label for each state on the list
         # else it just labels the state
         # Applies to vbar and choropleth Unsure about applying to categories right now..
-        l = state_label + f"\n{custom_label[i]}"
-
+        l = (
+            state_label + f"\n{custom_label[i]}"
+            if not pd.isna(custom_label[i])
+            else state_label
+        )
     elif numeric_labels:
-        pval = "" if np.isnan(p) else f"\n{str(round(p*100))}%"
+        pval = "" if pd.isna(p) else f"\n{str(round(p*100))}%"
         if type(numeric_labels) == str:
             if numeric_labels.lower() == "all":
                 l = state_label + pval
@@ -133,6 +177,7 @@ def _create_vbar_hex(
     pct,
     # color=["#1d3557","#e63946"],
     fill_color=["#ef476f", "#ffd166", "#06d6a0", "#118ab2"],
+    missing_fill_color="white",
     line_color="#ffffff",
     line_width=1,
 ):
@@ -159,19 +204,16 @@ def _create_vbar_hex(
         [description]
     """
 
-    # check if pct is a list of values or a single number
-    # if it's a length-one list convert it to the value
-
-    if type(pct) == list:
-        if len(pct) == 1:
-            pct = pct[0]
-
     if type(pct) == float:
         """
         if type pct==float, and chart_type=='vbar', the user presumably submitted
         single values between 0 and 1 intending to create a stacked bar chart "progress bar"
         with two values, aka original flavor lone-wolf.
         """
+
+        if np.isnan(pct):
+            fill_color = [missing_fill_color for i in fill_color]
+
         area_pct = pct
         # user inputs the percent of area they want colored so we need to translate that into a percent height
         if area_pct < 1 / 6:
@@ -411,6 +453,7 @@ def _create_choropleth_hex(
     line_width=1,
     colormap="viridis",
     choropleth_axis_label=None,
+    missing_fill_color="white",
 ):
 
     height = np.sqrt(3) / 2 * radius
@@ -420,7 +463,10 @@ def _create_choropleth_hex(
 
     cmap = plt.get_cmap(colormap)
     # see for reference https://matplotlib.org/stable/gallery/lines_bars_and_markers/fill_between_demo.html
-    artist = ax.fill_between(x, ytop, ybottom, facecolor=cmap(pct))
+    if np.isnan(pct):
+        artist = ax.fill_between(x, ytop, ybottom, facecolor=missing_fill_color)
+    else:
+        artist = ax.fill_between(x, ytop, ybottom, facecolor=cmap(pct))
     ax.plot(x, ytop, color=line_color, linewidth=line_width)
     ax.plot(x, ybottom, color=line_color, linewidth=line_width)
     return ax, artist
@@ -541,6 +587,7 @@ def plot_hex(
                     radius=radius,
                     pct=p,
                     fill_color=fill_color,
+                    missing_fill_color=missing_fill_color,
                     line_color=line_color,
                     line_width=line_width,
                 )
@@ -555,6 +602,7 @@ def plot_hex(
                     line_color=line_color,
                     line_width=line_width,
                     colormap=colormap,
+                    missing_fill_color=missing_fill_color,
                     choropleth_axis_label=choropleth_axis_label,
                 )
 
@@ -571,7 +619,9 @@ def plot_hex(
             l_new = _handle_numeric_labels(
                 l, p, i, numeric_labels, numeric_labels_custom
             )
-            state_text_color = missing_text_color if np.isnan(p) else text_color
+
+            state_text_color = _compute_state_text_color(p, text_color, missing_text_color)
+
             ax.text(
                 x,
                 y,
@@ -669,7 +719,7 @@ def us_plot_hex(
     l, h, v = _extract_coordinates(dataset)
 
     if numeric_labels_custom:
-        custom_labels = dataset[numeric_labels_custom]
+        custom_labels = dataset[numeric_labels_custom].fillna(np.nan)
     else:
         custom_labels = None
 

@@ -8,17 +8,17 @@ states_to_test = ["CA", "MD", "PA", "TX"]
 
 
 @pytest.mark.parametrize(
-    "filename,chart_type",
+    "filename,chart_type,show_figure",
     [
-        ("tests/data/demo_input1.csv", "vbar"),
-        ("tests/data/demo_input2.csv", "choropleth"),
-        ("tests/data/demo_input3.csv", "vbar"),
-        ("tests/data/demo_input4.csv", "vbar"),
-        ("tests/data/demo_input5.csv", "categorical"),
+        ("tests/data/demo_input1.csv", "vbar", False),
+        ("tests/data/demo_input2.csv", "choropleth", False),
+        ("tests/data/demo_input3.csv", "vbar", True),
+        ("tests/data/demo_input4.csv", "vbar", True),
+        ("tests/data/demo_input5.csv", "categorical", False),
     ],
 )
-def test_hex_shmap_default(filename, chart_type):
-    us_plot_hex(filename, chart_type=chart_type, show_figure=False)
+def test_hex_shmap_default(filename, chart_type, show_figure):
+    us_plot_hex(filename, chart_type=chart_type, show_figure=show_figure)
     assert 1 == 1
 
 
@@ -61,19 +61,25 @@ def test_hex_choropleth_custom(filename, numeric_labels, numeric_labels_custom):
 
 
 @pytest.mark.parametrize(
-    "filename,category_labels",
+    "filename,fill_color,category_labels",
     [
-        ("tests/data/demo_input5.csv", None),
         (
             "tests/data/demo_input5.csv",
+            ["#ef476f", "#ffd166", "#06d6a0", "#118ab2", "black",],
+            None,
+        ),
+        (
+            "tests/data/demo_input5.csv",
+            ["#ef476f", "#ffd166", "#06d6a0", "#118ab2", "black",],
             ["Apple", "Banana", "Cherry", "Durian", "Elderberry"],
         ),
     ],
 )
-def test_hex_categorical_custom(filename, category_labels):
+def test_hex_categorical_custom(filename, fill_color, category_labels):
     us_plot_hex(
         filename,
         chart_type="categorical",
+        fill_color=fill_color,
         category_labels=category_labels,
         show_figure=False,
     )
