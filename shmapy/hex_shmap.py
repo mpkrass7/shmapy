@@ -31,6 +31,8 @@ default_text_args = {
     "numeric_labels_custom": None,
 }
 
+default_missing_args = {"missing_text_color": "grey", "missing_text_fill": "white"}
+
 
 def _set_x(coord, height):
     x = [
@@ -70,7 +72,11 @@ def _set_y(coord, radius):
 
 
 def _handle_categories(
-    value_list, fill_color, chart_type, category_labels=None
+    value_list: list,
+    fill_color: list,
+    chart_type: str,
+    category_labels: list = None,
+    missing_fill_color: str = "white",
 ) -> list:
     if chart_type != "categorical":
         return value_list, category_labels
@@ -81,8 +87,10 @@ def _handle_categories(
         value_to_override_category = {
             val: c for val, c in zip(value_list.unique(), category_labels)
         }
+
         value_list = value_list.apply(lambda row: value_to_override_category[row])
         color_mapper = dict(zip(category_labels, fill_color))
+        color_mapper[None] = missing_fill_color
         return [color_mapper[i] for i in value_list], set(color_mapper.keys())
     else:
         # If no order is supplied we'll just do things in order
@@ -109,11 +117,12 @@ def _handle_numeric_labels(
         l = state_label + f"\n{custom_label[i]}"
 
     elif numeric_labels:
+        pval = "" if np.isnan(p) else f"\n{str(round(p*100))}%"
         if type(numeric_labels) == str:
             if numeric_labels.lower() == "all":
-                l = state_label + f"\n{str(round(p*100))}%"
+                l = state_label + pval
         elif len(numeric_labels) >= 1 and l in numeric_labels:
-            l = state_label + f"\n{str(round(p*100))}%"
+            l = state_label + pval
     return l
 
 
@@ -438,12 +447,12 @@ def plot_hex(
     labels,
     pct,
     chart_type,
-    excluded_color="grey",
     fill_color=["#ef476f", "#ffd166", "#06d6a0", "#118ab2"],
     # TODO: Remove excluded states as an argument and remap to throw in missing states
     excluded_states=None,
     out_path=None,
     show_figure=True,
+    missing_kwargs=default_missing_args,
     hex_kwargs=default_hex_args,
     text_kwargs=default_text_args,
     choropleth_axis_label=None,
@@ -487,21 +496,12 @@ def plot_hex(
 
     fig, ax = plt.subplots(**kwargs)
     i = 0
-    (
-        line_color,
-        line_width,
-        radius,
-        category_labels,
-        excluded_states,
-        excluded_color,
-        colormap,
-    ) = (
+    (line_color, line_width, radius, category_labels, excluded_states, colormap,) = (
         hex_kwargs.get("line_color"),
         hex_kwargs.get("line_width"),
         hex_kwargs.get("radius"),
         hex_kwargs.get("category_labels"),
         hex_kwargs.get("excluded_states"),
-        hex_kwargs.get("excluded_color"),
         hex_kwargs.get("colormap"),
     )
 
@@ -512,11 +512,17 @@ def plot_hex(
         text_kwargs.get("numeric_labels_custom"),
     )
 
+    missing_text_color, missing_fill_color = (
+        missing_kwargs.get("missing_text_color"),
+        missing_kwargs.get("missing_fill_color"),
+    )
+
     pct, derived_categories = _handle_categories(
         pct,
         fill_color=fill_color,
         chart_type=chart_type,
         category_labels=category_labels,
+        missing_fill_color=missing_fill_color,
     )
     # if category_labels is not set, instantiate an empty set in case
     # the user has categories defined in the input file
@@ -524,61 +530,59 @@ def plot_hex(
         category_labels = derived_categories
 
     for x, y, p, l in zip(hcoord, vcoord, pct, labels):
+        print(p, l)
+        if not excluded_states or l not in excluded_states:
 
-        try:
-            assert type(excluded_states) == list and l in excluded_states
-            temp_color = np.repeat(excluded_color, len(fill_color))
-            temp_text_color = "black"
-        except:
-            temp_color = fill_color
-            temp_text_color = text_color
+            if chart_type == "vbar":
 
-        if chart_type == "vbar":
-            _create_vbar_hex(
-                ax,
-                [x, y],
-                radius=radius,
-                pct=p,
-                fill_color=temp_color,
-                line_color=line_color,
-                line_width=line_width,
+                _create_vbar_hex(
+                    ax,
+                    [x, y],
+                    radius=radius,
+                    pct=p,
+                    fill_color=fill_color,
+                    line_color=line_color,
+                    line_width=line_width,
+                )
+            elif chart_type == "choropleth":
+
+                ax, artist = _create_choropleth_hex(
+                    fig,
+                    ax,
+                    [x, y],
+                    radius=radius,
+                    pct=p,
+                    line_color=line_color,
+                    line_width=line_width,
+                    colormap=colormap,
+                    choropleth_axis_label=choropleth_axis_label,
+                )
+
+            else:
+                _create_categorical_hex(
+                    ax,
+                    [x, y],
+                    radius=radius,
+                    pct=p,
+                    line_color=line_color,
+                    line_width=line_width,
+                )
+
+            l_new = _handle_numeric_labels(
+                l, p, i, numeric_labels, numeric_labels_custom
             )
-        elif chart_type == "choropleth":
-            ax, artist = _create_choropleth_hex(
-                fig,
-                ax,
-                [x, y],
-                radius=radius,
-                pct=p,
-                line_color=line_color,
-                line_width=line_width,
-                colormap=colormap,
-                choropleth_axis_label=choropleth_axis_label,
+            state_text_color = missing_text_color if np.isnan(p) else text_color
+            ax.text(
+                x,
+                y,
+                l_new,
+                ha="center",
+                va="center",
+                size=size,
+                family="monospace",
+                color=state_text_color,
             )
-
-        else:
-            _create_categorical_hex(
-                ax,
-                [x, y],
-                radius=radius,
-                pct=p,
-                line_color=line_color,
-                line_width=line_width,
-            )
-
-        l_new = _handle_numeric_labels(l, p, i, numeric_labels, numeric_labels_custom)
-
-        ax.text(
-            x,
-            y,
-            l_new,
-            ha="center",
-            va="center",
-            size=size,
-            family="monospace",
-            color=temp_text_color,
-        )
-        i += 1
+            i += 1
 
     plt.axis("off")
     if chart_type == "choropleth" and choropleth_axis_label:
@@ -602,7 +606,6 @@ def plot_hex(
 def us_plot_hex(
     input_df,
     chart_type="vbar",
-    excluded_color="grey",
     radius=1,
     size=10,
     fill_color=["#ef476f", "#ffd166", "#06d6a0", "#118ab2", "black", "white"],
@@ -613,6 +616,7 @@ def us_plot_hex(
     numeric_labels=None,
     numeric_labels_custom=None,
     excluded_states=None,
+    missing_kwargs={"missing_text_color": "grey", "missing_fill_color": "white"},
     show_figure=True,
     out_path=None,
     choropleth_axis_label=None,
@@ -659,7 +663,9 @@ def us_plot_hex(
         }
     )
 
-    dataset = coordinate_df.merge(input_df, left_on="Abbreviation", right_on="state")
+    dataset = coordinate_df.merge(
+        input_df, how="left", left_on="Abbreviation", right_on="state"
+    )
     l, h, v = _extract_coordinates(dataset)
 
     if numeric_labels_custom:
@@ -673,7 +679,6 @@ def us_plot_hex(
         "radius": radius,
         "category_labels": category_labels,
         "excluded_states": excluded_states,
-        "excluded_color": excluded_color,
         "colormap": colormap,
     }
 
@@ -693,8 +698,8 @@ def us_plot_hex(
         fill_color=fill_color,
         out_path=out_path,
         show_figure=show_figure,
-        excluded_color=excluded_color,
         excluded_states=excluded_states,
+        missing_kwargs=missing_kwargs,
         hex_kwargs=hex_args,
         text_kwargs=text_args,
         choropleth_axis_label=choropleth_axis_label,
