@@ -19,9 +19,17 @@ default_hex_args = {
     "line_color": "#ffffff",
     "line_width": 1,
     "radius": 1,
+    "category_labels": None,
+    "excluded_color": "lightgrey",
+    "colormap": "viridis",
 }
 
-default_text_args = {"text_color": "#ffffff"}
+default_text_args = {
+    "size": 10,
+    "text_color": "white",
+    "numeric_labels": None,
+    "numeric_labels_custom": None,
+}
 
 
 def _set_x(coord, height):

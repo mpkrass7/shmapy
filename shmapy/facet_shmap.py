@@ -56,8 +56,8 @@ def facet_plot_us(
             if (row, col) not in valid_coords:
                 ax[row, col].remove()
 
-    plt.show()
+    f.show()
     if out_path:
-        plt.savefig(out_path)
+        f.savefig(out_path, bbox_inches="tight", transparent=True)
     return
 
