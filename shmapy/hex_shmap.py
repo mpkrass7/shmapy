@@ -34,13 +34,6 @@ default_text_args = {
 default_missing_args = {"missing_text_color": "grey", "missing_text_fill": "white"}
 
 
-def _check_nulls(value):
-    if type(value) == list:
-        return True
-    if np.isnan(value) | value is None | pd.isna(value) | value == "":
-        return False
-
-
 def _set_x(coord, height):
     x = [
         coord - height,
