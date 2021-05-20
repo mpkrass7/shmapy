@@ -306,7 +306,6 @@ def _create_vbar_hex(
                 ytop[1],
                 ytop[0],
             ]
-
         ax.fill_between(x, ybottom, ymiddle, facecolor=fill_color[0])
         ax.fill_between(x, ymiddle, ytop, facecolor=fill_color[1])
         ax.plot(x, ytop, color=line_color, linewidth=line_width)
@@ -431,8 +430,8 @@ def _create_vbar_hex(
 
             ax.fill_between(x, ybottom, ymiddle, facecolor=fill_color[n])
             # ax.fill_between(x, ymiddle, ytop, facecolor=color[1])
-            ax.plot(x, ytop, color=line_color, linewidth=1)
-            ax.plot(x, ybottom, color=line_color, linewidth=1)
+            ax.plot(x, ytop, color=line_color, linewidth=line_width)
+            ax.plot(x, ybottom, color=line_color, linewidth=line_width)
     return ax
 
 
