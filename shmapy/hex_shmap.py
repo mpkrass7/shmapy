@@ -576,7 +576,6 @@ def plot_hex(
         category_labels = derived_categories
 
     for x, y, p, l in zip(hcoord, vcoord, pct, labels):
-        print(p, l)
         if not excluded_states or l not in excluded_states:
 
             if chart_type == "vbar":
@@ -620,7 +619,9 @@ def plot_hex(
                 l, p, i, numeric_labels, numeric_labels_custom
             )
 
-            state_text_color = _compute_state_text_color(p, text_color, missing_text_color)
+            state_text_color = _compute_state_text_color(
+                p, text_color, missing_text_color
+            )
 
             ax.text(
                 x,
@@ -666,7 +667,8 @@ def us_plot_hex(
     numeric_labels=None,
     numeric_labels_custom=None,
     excluded_states=None,
-    missing_kwargs={"missing_text_color": "grey", "missing_fill_color": "white"},
+    missing_text_color="grey",
+    missing_fill_color="white",
     show_figure=True,
     out_path=None,
     choropleth_axis_label=None,
@@ -737,6 +739,11 @@ def us_plot_hex(
         "text_color": text_color,
         "numeric_labels": numeric_labels,
         "numeric_labels_custom": custom_labels,
+    }
+
+    missing_kwargs = {
+        "missing_text_color": missing_text_color,
+        "missing_fill_color": missing_fill_color,
     }
 
     return plot_hex(

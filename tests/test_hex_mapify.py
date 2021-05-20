@@ -12,8 +12,8 @@ states_to_test = ["CA", "MD", "PA", "TX"]
     [
         ("tests/data/demo_input1.csv", "vbar", False),
         ("tests/data/demo_input2.csv", "choropleth", False),
-        ("tests/data/demo_input3.csv", "vbar", True),
-        ("tests/data/demo_input4.csv", "vbar", True),
+        ("tests/data/demo_input3.csv", "vbar", False),
+        ("tests/data/demo_input4.csv", "vbar", False),
         ("tests/data/demo_input5.csv", "categorical", False),
     ],
 )
