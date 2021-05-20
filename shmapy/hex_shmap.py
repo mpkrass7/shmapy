@@ -680,23 +680,21 @@ def us_plot_hex(
     All other columns are truncated
     Returns a hex map of the united states based on the user input
 
-    :param input_df: [User provided dataframe, dictionary, or file location. Function will read first two columns as state and value]
+    :param input_df: User provided dataframe, dictionary, or file location. Function will read first two columns as state and value
     :type input_df: [type]
-    :param out_path: [description], defaults to None
+    :param out_path: Location to save image, defaults to None
     :type out_path: [type], optional
-    :param radius: [description], defaults to 1
+    :param radius: size of hexagon, defaults to 1
     :type radius: int, optional
-    :param size: [description], defaults to 10
+    :param size: size of text, defaults to 10
     :type size: int, optional
-    :param fill_color: [description], defaults to "#d90429"
+    :param fill_color: list of colors to fill the hex map with. Not used in choropleth map
     :type fill_color: str, optional
-    :param top_color: [description], defaults to "#000000"
-    :type top_color: str, optional
-    :param line_color: [description], defaults to "#ffffff"
+    :param line_color: The outline of the hexagons. Black usually looks pretty good, defaults to "#ffffff"
     :type line_color: str, optional
     :param text_color: [description], defaults to "#ffffff"
     :type text_color: str, optional
-    :param figsize: [description], defaults to (8, 5)
+    :param figsize: Matplotlib size of figure, defaults to (8, 5)
     :type figsize: tuple, optional
     :param choropleth_axis_label: Label for the choropleth colorbar.
     :type choropleth_axis_label: str

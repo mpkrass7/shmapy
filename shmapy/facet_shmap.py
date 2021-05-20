@@ -24,6 +24,7 @@ def facet_plot_us(
     figsize=(16, 12),
     layout_args=None,
     subplot_args=None,
+    show_figure=True,
     out_path=None,
     **fwargs
 ) -> None:
@@ -46,6 +47,7 @@ def facet_plot_us(
         derp = ax[row, col]
 
         # derp should take in a plotting function of some kind
+        # No, I'm not changing the name derp, I like it
         function(derp, df_temp, **fwargs)
 
     #     derp.title.set_backgroundcolor('lightgray')
@@ -56,7 +58,8 @@ def facet_plot_us(
             if (row, col) not in valid_coords:
                 ax[row, col].remove()
 
-    f.show()
+    if show_figure:
+        plt.show()
     if out_path:
         f.savefig(out_path, bbox_inches="tight", transparent=True)
     return
