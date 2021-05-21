@@ -197,16 +197,22 @@ def _create_vbar_hex(
         [description]
     """
 
+    if np.isnan(pct):
+        # if pct is nan just do what we do for a choropleth
+        height = np.sqrt(3) / 2 * radius
+        x = _set_x(coord[0], height)
+        ytop, ybottom = _set_y(coord[1], radius)
+        ax.fill_between(x, ytop, ybottom, facecolor=missing_fill_color)
+        ax.plot(x, ytop, color=line_color, linewidth=line_width)
+        ax.plot(x, ybottom, color=line_color, linewidth=line_width)
+        return
+
     if type(pct) == float:
         """
         if type pct==float, and chart_type=='vbar', the user presumably submitted
         single values between 0 and 1 intending to create a stacked bar chart "progress bar"
         with two values, aka original flavor lone-wolf.
         """
-
-        # NaN pct get missing fill color
-        if np.isnan(pct):
-            fill_color = [missing_fill_color for _ in fill_color]
 
         area_pct = pct
         # user inputs the percent of area they want colored so we need to translate that into a percent height
@@ -308,8 +314,6 @@ def _create_vbar_hex(
                 ytop[0],
             ]
 
-        print(fill_color[0])
-        print(fill_color[1])
         ax.fill_between(x, ybottom, ymiddle, facecolor=fill_color[0])
         ax.fill_between(x, ymiddle, ytop, facecolor=fill_color[1])
         ax.plot(x, ytop, color=line_color, linewidth=line_width)
