@@ -61,6 +61,8 @@ def facet_plot_us(
     if show_figure:
         plt.show()
     if out_path:
-        f.savefig(out_path, bbox_inches="tight", transparent=True)
+        f.savefig(
+            out_path, bbox_inches="tight",
+        )
     return
 

@@ -20,6 +20,42 @@ Or Install from source:
 
 Checkout the `shmapy/examples/shmapy_basics.ipynb` notebook
 
+# Usage
+Shmapy can be used by importing the package as a module, or as a command-line tool
+## Module
+See common use cases in the [example jupyter notebook](https://github.com/mpkrass7/shmapy/blob/main/shmapy/examples/shmapy_basics.ipynb))
+
+Read in your dataset
+```python
+import pandas as pd
+import shmapy
+df = pd.read_csv(shmapy/static/demo_input1.csv)
+df.head(10)
+
+AK,0.448415868
+AL,0.178259515
+AR,0.094003348
+AZ,0.263422391
+CA,0.110670893
+CO,0.179617281
+CT,0.1960641
+DC,0.171112619
+DE,0.241586764
+FL,0.040757232
+```
+
+```python
+shmapy.us_plot_hex(
+  df,
+  chart_type='choropleth', 
+  numeric_labels='all',
+  line_color='black',
+  figsize=(10,6),
+  size=12
+)
+```
+![](./shmapy/img/hex_out_demo1_choropleth_clean.png)
+
 ## Easy on the Command Line
 
 ```bash
@@ -58,7 +94,15 @@ FL,0.040757232
 
 ![](./shmapy/img/hex_out_demo5.png)
 
-## Input Dataframe
+
+## Introducing Facet Shmap! (Python library only)
+Facet Shmap lets you facet your plotting function across the United States.
+
+See the [shmapy basics notebook](https://github.com/mpkrass7/shmapy/blob/main/shmapy/examples/shmapy_basics.ipynb) in `shmapy/examples/` for examples on how to do this.
+
+![](./shmapy/img/facet_shmap_output_1.png)
+
+## Hex Shmap Input Dataframe
 
 shmapy takes an input dataframe with at least two columns. The first column is
 assumed to contain two-letter, capitalized state abbreviations or full state 
@@ -104,11 +148,6 @@ custom numeric labels for the states. Default None. A numeric custom label repla
 the standard numeric label and is positioned under the state name.
 
 
-**Special Credits to Kevin Arvai for building the real infrastructure on this package and Gregory Michaelson for figuring out how to partially fill a hexagon**
 
-## To Do Items:
-- Users can optionally exclude states (filling in an arbitrary color)
-- Users can supply custom cooridnates for the hexagons
-- Users have **kwargs access to plot output to optionally include axes, title etc.. -- Some Kwargs are here!
-- Flexibility around state name or abbrev capitalization
-- Flexibility around number of states provided
+
+**Special Credits to Kevin Arvai for building the real infrastructure on this package and Gregory Michaelson for figuring out how to partially fill a hexagon**

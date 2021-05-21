@@ -501,6 +501,7 @@ def plot_hex(
     missing_kwargs=default_missing_args,
     hex_kwargs=default_hex_args,
     text_kwargs=default_text_args,
+    legend=False,
     choropleth_axis_label=None,
     category_labels=None,
     **kwargs,
@@ -629,13 +630,13 @@ def plot_hex(
         i += 1
 
     plt.axis("off")
-    if chart_type == "choropleth" and choropleth_axis_label:
+    if chart_type == "choropleth" and choropleth_axis_label and legend:
         cax = fig.add_axes([0.85, 0.2, 0.03, 0.25], label=choropleth_axis_label)
         cax.set_xlabel(choropleth_axis_label)
         fig.colorbar(artist, cax=cax, ax=ax)
         ax.axis("off")
 
-    if category_labels:
+    if category_labels and legend:
         # custom legend
         patches = []
         for color, label in zip(fill_color, category_labels):
@@ -662,6 +663,7 @@ def us_plot_hex(
     numeric_labels_custom=None,
     missing_text_color="grey",
     missing_fill_color="white",
+    legend=False,
     show_figure=True,
     out_path=None,
     choropleth_axis_label=None,
@@ -750,6 +752,7 @@ def us_plot_hex(
         hex_kwargs=hex_args,
         text_kwargs=text_args,
         choropleth_axis_label=choropleth_axis_label,
+        legend=legend,
         category_labels=category_labels,
         **kwargs,
     )
