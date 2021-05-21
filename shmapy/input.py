@@ -27,15 +27,6 @@ def _extract_coordinates(coords):
     return labels, hcoord, vcoord
 
 
-def read_user_coordinates(df):
-    # Read in of X, Y, label coordinates for hexagons
-    df.columns = ["X", "Y", "Abbreviation"]
-
-    l, h, v = _extract_coordinates(df)
-
-    return l, h, v
-
-
 def state_to_abbreviation(values):
     """Always convert to state abbreviations"""
     coords = _read_coordinate_file()

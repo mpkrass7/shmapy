@@ -5,7 +5,6 @@ from shmapy.input import (
     _read_user_input,
     _read_coordinate_file,
     _extract_coordinates,
-    read_user_coordinates,
     state_to_abbreviation,
 )
 
