@@ -47,7 +47,7 @@ def state_validator(values):
         warnings.warn(
             """
         Expected input should only include 50 or 51 states. 
-        Map will have missing hexagons
+        Missing values will be filled in with missing_* keyword arguments
          """
         )
 
