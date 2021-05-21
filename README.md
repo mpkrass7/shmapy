@@ -1,6 +1,7 @@
 
 # Shmapy
 [![codecov](https://codecov.io/gh/mpkrass7/shmapy/branch/main/graph/badge.svg?token=CEZPWV1NIR)](https://codecov.io/gh/mpkrass7/shmapy)
+[![Downloads](https://static.pepy.tech/personalized-badge/shmapy?period=month&units=international_system&left_color=lightgrey&right_color=blue&left_text=Downloads)](https://pepy.tech/project/shmapy)
 
 The fabulous package for building hex maps and facet maps
 
