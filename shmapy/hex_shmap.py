@@ -204,8 +204,9 @@ def _create_vbar_hex(
         with two values, aka original flavor lone-wolf.
         """
 
+        # NaN pct get missing fill color
         if np.isnan(pct):
-            fill_color = [missing_fill_color for i in fill_color]
+            fill_color = [missing_fill_color for _ in fill_color]
 
         area_pct = pct
         # user inputs the percent of area they want colored so we need to translate that into a percent height
@@ -306,10 +307,15 @@ def _create_vbar_hex(
                 ytop[1],
                 ytop[0],
             ]
+
+        print(fill_color[0])
+        print(fill_color[1])
         ax.fill_between(x, ybottom, ymiddle, facecolor=fill_color[0])
         ax.fill_between(x, ymiddle, ytop, facecolor=fill_color[1])
         ax.plot(x, ytop, color=line_color, linewidth=line_width)
         ax.plot(x, ybottom, color=line_color, linewidth=line_width)
+
+        return ax
 
     elif type(pct) == list:
         """
@@ -432,7 +438,7 @@ def _create_vbar_hex(
             # ax.fill_between(x, ymiddle, ytop, facecolor=color[1])
             ax.plot(x, ytop, color=line_color, linewidth=line_width)
             ax.plot(x, ybottom, color=line_color, linewidth=line_width)
-    return ax
+        return ax
 
 
 def _create_choropleth_hex(
@@ -486,8 +492,6 @@ def plot_hex(
     pct,
     chart_type,
     fill_color=["#ef476f", "#ffd166", "#06d6a0", "#118ab2"],
-    # TODO: Remove excluded states as an argument and remap to throw in missing states
-    excluded_states=None,
     out_path=None,
     show_figure=True,
     missing_kwargs=default_missing_args,
@@ -534,12 +538,11 @@ def plot_hex(
 
     fig, ax = plt.subplots(**kwargs)
     i = 0
-    (line_color, line_width, radius, category_labels, excluded_states, colormap,) = (
+    (line_color, line_width, radius, category_labels, colormap,) = (
         hex_kwargs.get("line_color"),
         hex_kwargs.get("line_width"),
         hex_kwargs.get("radius"),
         hex_kwargs.get("category_labels"),
-        hex_kwargs.get("excluded_states"),
         hex_kwargs.get("colormap"),
     )
 
@@ -568,64 +571,58 @@ def plot_hex(
         category_labels = derived_categories
 
     for x, y, p, l in zip(hcoord, vcoord, pct, labels):
-        if not excluded_states or l not in excluded_states:
+        if chart_type == "vbar":
 
-            if chart_type == "vbar":
-
-                _create_vbar_hex(
-                    ax,
-                    [x, y],
-                    radius=radius,
-                    pct=p,
-                    fill_color=fill_color,
-                    missing_fill_color=missing_fill_color,
-                    line_color=line_color,
-                    line_width=line_width,
-                )
-            elif chart_type == "choropleth":
-
-                ax, artist = _create_choropleth_hex(
-                    fig,
-                    ax,
-                    [x, y],
-                    radius=radius,
-                    pct=p,
-                    line_color=line_color,
-                    line_width=line_width,
-                    colormap=colormap,
-                    missing_fill_color=missing_fill_color,
-                    choropleth_axis_label=choropleth_axis_label,
-                )
-
-            else:
-                _create_categorical_hex(
-                    ax,
-                    [x, y],
-                    radius=radius,
-                    pct=p,
-                    line_color=line_color,
-                    line_width=line_width,
-                )
-
-            l_new = _handle_numeric_labels(
-                l, p, i, numeric_labels, numeric_labels_custom
+            _create_vbar_hex(
+                ax,
+                [x, y],
+                radius=radius,
+                pct=p,
+                fill_color=fill_color,
+                missing_fill_color=missing_fill_color,
+                line_color=line_color,
+                line_width=line_width,
             )
 
-            state_text_color = _compute_state_text_color(
-                p, text_color, missing_text_color
+        elif chart_type == "choropleth":
+            ax, artist = _create_choropleth_hex(
+                fig,
+                ax,
+                [x, y],
+                radius=radius,
+                pct=p,
+                line_color=line_color,
+                line_width=line_width,
+                colormap=colormap,
+                missing_fill_color=missing_fill_color,
+                choropleth_axis_label=choropleth_axis_label,
             )
 
-            ax.text(
-                x,
-                y,
-                l_new,
-                ha="center",
-                va="center",
-                size=size,
-                family="monospace",
-                color=state_text_color,
+        else:
+            _create_categorical_hex(
+                ax,
+                [x, y],
+                radius=radius,
+                pct=p,
+                line_color=line_color,
+                line_width=line_width,
             )
-            i += 1
+
+        l_new = _handle_numeric_labels(l, p, i, numeric_labels, numeric_labels_custom)
+
+        state_text_color = _compute_state_text_color(p, text_color, missing_text_color)
+
+        ax.text(
+            x,
+            y,
+            l_new,
+            ha="center",
+            va="center",
+            size=size,
+            family="monospace",
+            color=state_text_color,
+        )
+        i += 1
 
     plt.axis("off")
     if chart_type == "choropleth" and choropleth_axis_label:
@@ -652,19 +649,18 @@ def us_plot_hex(
     radius=1,
     size=10,
     fill_color=["#ef476f", "#ffd166", "#06d6a0", "#118ab2", "black", "white"],
+    category_labels=None,
     line_color="#ffffff",
     line_width=1,
     text_color="#ffffff",
     colormap="viridis",
     numeric_labels=None,
     numeric_labels_custom=None,
-    excluded_states=None,
     missing_text_color="grey",
     missing_fill_color="white",
     show_figure=True,
     out_path=None,
     choropleth_axis_label=None,
-    category_labels=None,
     **kwargs,
 ):
     """
@@ -682,6 +678,10 @@ def us_plot_hex(
     :type size: int, optional
     :param fill_color: list of colors to fill the hex map with. Not used in choropleth map
     :type fill_color: str, optional
+    :param category_labels: List of strings that describe the categories of the graph. Used in the legend.
+    Note that the order input for the categories should match the order input for fill colors to map them properly.
+    If no category labels are specified, the mapping will be determined alphabetically
+    :type category_labels: list of strings 
     :param line_color: The outline of the hexagons. Black usually looks pretty good, defaults to "#ffffff"
     :type line_color: str, optional
     :param text_color: [description], defaults to "#ffffff"
@@ -690,8 +690,6 @@ def us_plot_hex(
     :type figsize: tuple, optional
     :param choropleth_axis_label: Label for the choropleth colorbar.
     :type choropleth_axis_label: str
-    :param category_labels: List of strings that describe the categories of the graph. Used in the legend. Defaults to None.
-    :type category_labels: list of strings 
     :return: [description]
     :rtype: [type]
     """
@@ -720,7 +718,6 @@ def us_plot_hex(
         "line_width": line_width,
         "radius": radius,
         "category_labels": category_labels,
-        "excluded_states": excluded_states,
         "colormap": colormap,
     }
 
@@ -745,7 +742,6 @@ def us_plot_hex(
         fill_color=fill_color,
         out_path=out_path,
         show_figure=show_figure,
-        excluded_states=excluded_states,
         missing_kwargs=missing_kwargs,
         hex_kwargs=hex_args,
         text_kwargs=text_args,
