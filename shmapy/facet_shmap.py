@@ -71,7 +71,7 @@ def facet_plot_us(
 
 def facet_plot_coordinates(
     df,
-    state_plotting_function,
+    plotting_function,
     facet_col="state",
     row_id="row",
     column_id="column",
@@ -80,7 +80,29 @@ def facet_plot_coordinates(
     out_path=None,
     **fwargs
 ) -> None:
+    """
+    Make a plot faceted by a specified column with placement determined by the user supplied row id and column id 
 
+    :param df: User provided dataframe. Must contain a columns 'row' and 'column' or else be supplied by the user
+    :type input_df: DataFrame
+    :param plotting_function: User provided function that takes an axis subplot and a single facet of the data frame an an argument to build a plot. See example notebook
+    :type plotting_function: sunction
+    :param facet_col: User provided column to split charts on. Defaults to 'state'
+    :type facet_col: string'
+    :param row_id: User provided column to place subplot vertically. Defaults to 'row'
+    :type row_id: string'
+    :param column_id: User provided column to place subplot horizontally. Defaults to 'column'
+    :type column_id: string
+    :param figsize: Matplotlib size of figure, defaults to (16, 12)
+    :type figsize: tuple, optional
+    :param show_figure: Argument to render dataframe. Defaults to True
+    :type show_figure: bool, optional
+    :param out_path: Location to save image, defaults to None
+    :type out_path: string, optional
+
+    :return: None
+    :rtype: None
+    """
     df_plot = df.copy()
     valid_coords = list(map(tuple, df[[row_id, column_id]].values))
     # logger.info(df_coordinates.head())
@@ -97,7 +119,7 @@ def facet_plot_coordinates(
 
         # derp should take in a plotting function of some kind
         # No, I'm not changing the name derp, I like it
-        state_plotting_function(derp, df_temp, **fwargs)
+        plotting_function(derp, df_temp, **fwargs)
 
     #     derp.title.set_backgroundcolor('lightgray')
     f.tight_layout(pad=0.05)
