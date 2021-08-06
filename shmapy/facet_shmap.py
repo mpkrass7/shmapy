@@ -1,7 +1,9 @@
-import pandas as pd
-from logzero import logger
+import itertools
 from pathlib import Path
+
+from logzero import logger
 import matplotlib.pyplot as plt
+import pandas as pd
 
 project_directory = Path(__file__).parent
 
@@ -19,7 +21,7 @@ def merge_coordinates(df, coordinates, merge_column) -> pd.DataFrame:
 
 def facet_plot_us(
     df,
-    function,
+    state_plotting_function,
     facet_col="state",
     figsize=(16, 12),
     layout_args=None,
@@ -48,7 +50,7 @@ def facet_plot_us(
 
         # derp should take in a plotting function of some kind
         # No, I'm not changing the name derp, I like it
-        function(derp, df_temp, **fwargs)
+        state_plotting_function(derp, df_temp, **fwargs)
 
     #     derp.title.set_backgroundcolor('lightgray')
     f.tight_layout(pad=0.05)
@@ -66,3 +68,50 @@ def facet_plot_us(
         )
     return
 
+
+def facet_plot_coordinates(
+    df,
+    state_plotting_function,
+    facet_col="state",
+    row_id="row",
+    column_id="column",
+    figsize=(16, 12),
+    show_figure=True,
+    out_path=None,
+    **fwargs
+) -> None:
+
+    df_plot = df.copy()
+    valid_coords = list(map(tuple, df[[row_id, column_id]].values))
+    # logger.info(df_coordinates.head())
+    # Four axes, returned as a 2-d array
+    row_max, column_max = df[row_id].max() + 1, df[column_id].max() + 1
+    f, ax = plt.subplots(row_max, column_max, figsize=figsize)
+    df_plot["row_col"] = list(map(tuple, df_plot[[row_id, column_id]].values))
+
+    for row_col in valid_coords:
+        df_temp = df_plot.loc[df_plot.row_col == row_col]
+        state_cd = df_plot.loc[df_plot.index == row_col, facet_col]
+        row, col = row_col
+        derp = ax[row, col]
+
+        # derp should take in a plotting function of some kind
+        # No, I'm not changing the name derp, I like it
+        state_plotting_function(derp, df_temp, **fwargs)
+
+    #     derp.title.set_backgroundcolor('lightgray')
+    f.tight_layout(pad=0.05)
+
+    [
+        ax[row, col].remove()
+        for row, col in list(itertools.product(range(row_max), range(column_max)))
+        if (row, col) not in valid_coords
+    ]
+
+    if show_figure:
+        plt.show()
+    if out_path:
+        f.savefig(
+            out_path, bbox_inches="tight",
+        )
+    return
