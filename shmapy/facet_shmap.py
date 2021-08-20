@@ -104,7 +104,7 @@ def facet_plot_coordinates(
     :rtype: None
     """
     df_plot = df.copy()
-    valid_coords = list(map(tuple, df[[row_id, column_id]].values))
+    valid_coords = list(set(map(tuple, df[[row_id, column_id]].values)))
     # logger.info(df_coordinates.head())
     # Four axes, returned as a 2-d array
     row_max, column_max = df[row_id].max() + 1, df[column_id].max() + 1
