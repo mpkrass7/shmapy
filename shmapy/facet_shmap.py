@@ -72,23 +72,21 @@ def facet_plot_us(
 def facet_plot_coordinates(
     df,
     plotting_function,
-    facet_col="state",
     row_id="row",
     column_id="column",
     figsize=(16, 12),
+    padding=0.05,
     show_figure=True,
     out_path=None,
     **fwargs
 ) -> None:
     """
-    Make a plot faceted by a specified column with placement determined by the user supplied row id and column id 
+    Make a plot with subplots placed by user supplied row id and column id 
 
     :param df: User provided dataframe. Must contain a columns 'row' and 'column' or else be supplied by the user
     :type input_df: DataFrame
     :param plotting_function: User provided function that takes an axis subplot and a single facet of the data frame an an argument to build a plot. See example notebook
     :type plotting_function: sunction
-    :param facet_col: User provided column to split charts on. Defaults to 'state'
-    :type facet_col: string'
     :param row_id: User provided column to place subplot vertically. Defaults to 'row'
     :type row_id: string'
     :param column_id: User provided column to place subplot horizontally. Defaults to 'column'
@@ -113,7 +111,7 @@ def facet_plot_coordinates(
 
     for row_col in valid_coords:
         df_temp = df_plot.loc[df_plot.row_col == row_col]
-        state_cd = df_plot.loc[df_plot.index == row_col, facet_col]
+        # state_cd = df_plot.loc[df_plot.index == row_col, facet_col]
         row, col = row_col
         derp = ax[row, col]
 
@@ -122,7 +120,7 @@ def facet_plot_coordinates(
         plotting_function(derp, df_temp, **fwargs)
 
     #     derp.title.set_backgroundcolor('lightgray')
-    f.tight_layout(pad=0.05)
+    f.tight_layout(pad=padding)
 
     [
         ax[row, col].remove()
